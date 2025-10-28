@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+
 
 export default function PathFinderApp() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   const interests = [
@@ -59,6 +62,13 @@ export default function PathFinderApp() {
                 key={interest.name}
                 style={styles.interestCard}
                 activeOpacity={0.8}
+                onPress={() => {
+                  if (interest.name === 'Sciences') {
+                    router.push('/sciences');
+                  } else if (interest.name === 'Technology') {
+                    router.push('/technology');
+                  }
+                }}
               >
                 <Text style={styles.interestIcon}>{interest.icon}</Text>
                 <Text style={styles.interestName}>{interest.name}</Text>
@@ -71,7 +81,15 @@ export default function PathFinderApp() {
           <Text style={styles.sectionTitle}>Popular Career Paths</Text>
           <View style={styles.careerList}>
             {careerPaths.map((career, index) => (
-              <TouchableOpacity key={index} activeOpacity={0.8}>
+              <TouchableOpacity 
+              key={index} 
+              activeOpacity={0.8}
+              onPress={() => {
+                if (career.title === 'Data Scientist') {
+                  router.push('/data-scientist');
+                }
+              }}
+              >
                 <View style={styles.careerCard}>
                   <View>
                     <Text style={styles.careerTitle}>{career.title}</Text>
