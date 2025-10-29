@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 
 
@@ -49,8 +49,7 @@ export default function PathFinderApp() {
   const filteredCareers = searchQuery.trim()
     ? allCareers
         .filter(career =>
-          career.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          career.category.toLowerCase().includes(searchQuery.toLowerCase())
+          career.title.toLowerCase().includes(searchQuery.toLowerCase())
         )
         .sort((a, b) => {
           const query = searchQuery.toLowerCase();
@@ -81,7 +80,12 @@ export default function PathFinderApp() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={searchQuery.trim() === ''}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>PathFinder</Text>
           <Text style={styles.subtitle}>Discover your dream career path</Text>
@@ -98,51 +102,6 @@ export default function PathFinderApp() {
               placeholderTextColor="#9CA3AF"
             />
           </View>
-
-          {/* Search Results Dropdown */}
-          {searchQuery.trim() !== '' && (
-            <View style={styles.searchResultsDropdown}>
-              {filteredCareers.length > 0 ? (
-                <>
-                  <Text style={styles.searchResultsTitle}>
-                    Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
-                  </Text>
-                  <ScrollView 
-                    style={styles.searchResultsScroll}
-                    showsVerticalScrollIndicator={false}
-                    nestedScrollEnabled={true}
-                  >
-                    <View style={styles.searchResultsList}>
-                      {filteredCareers.map((career, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.searchResultCard}
-                          activeOpacity={0.8}
-                          onPress={() => {
-                            router.push(career.route as any);
-                            setSearchQuery(''); // Clear search after selection
-                          }}
-                        >
-                          <View>
-                            <Text style={styles.searchResultTitle}>{career.title}</Text>
-                            <Text style={styles.searchResultCategory}>{career.category}</Text>
-                          </View>
-                          <View style={styles.searchResultArrow}>
-                            <Text style={styles.searchResultArrowIcon}>→</Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </ScrollView>
-                </>
-              ) : (
-                <View style={styles.noResultsContainer}>
-                  <Text style={styles.noResultsText}>No careers found for "{searchQuery}"</Text>
-                  <Text style={styles.noResultsSubtext}>Try searching for a different career or category</Text>
-                </View>
-              )}
-            </View>
-          )}
         </View>
 
         <View style={styles.quizContainer}>
@@ -218,6 +177,55 @@ export default function PathFinderApp() {
         </View>
       </ScrollView>
 
+      {/* Search Results Dropdown - Outside ScrollView */}
+      {searchQuery.trim() !== '' && (
+        <View style={styles.searchResultsDropdown}>
+          {filteredCareers.length > 0 ? (
+            <>
+              <Text style={styles.searchResultsTitle}>
+                Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
+              </Text>
+              <ScrollView 
+                style={styles.searchResultsScroll}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+              >
+                <View style={styles.searchResultsList}>
+                  {filteredCareers.map((career, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.searchResultCard}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      Keyboard.dismiss(); // Dismiss keyboard first
+                      router.push(career.route as any);
+                      // Delay clearing search to keep dropdown visible during transition
+                      setTimeout(() => setSearchQuery(''), 300);
+                    }}
+                  >
+                      <View>
+                        <Text style={styles.searchResultTitle}>{career.title}</Text>
+                        <Text style={styles.searchResultCategory}>{career.category}</Text>
+                      </View>
+                      <View style={styles.searchResultArrow}>
+                        <Text style={styles.searchResultArrowIcon}>→</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </>
+          ) : (
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>No careers found for "{searchQuery}"</Text>
+              <Text style={styles.noResultsSubtext}>Try searching for a different career or category</Text>
+            </View>
+          )}
+        </View>
+      )}
+
       <View style={styles.mentorButtonContainer}>
         <TouchableOpacity activeOpacity={0.9}>
           <View style={styles.mentorButton}>
@@ -241,6 +249,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 24,
+    zIndex: 1001, // Above dropdown
+    backgroundColor: '#FDF2F8', // Match container background
   },
   title: {
     fontSize: 28,
@@ -255,8 +265,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 24,
     marginBottom: 24,
-    position: 'relative',
-    zIndex: 1000,
+    zIndex: 1001, // Above dropdown
+    backgroundColor: '#FDF2F8', // Match container background
   },
   searchBar: {
     backgroundColor: '#F3F4F6',
@@ -404,36 +414,35 @@ const styles = StyleSheet.create({
   // Search Results Styles
   searchResultsDropdown: {
     position: 'absolute',
-    top: 60, // Position below the search bar
-    left: 0,
-    right: 0,
+    top: 175, // Position below the search bar (header + search bar + gap)
+    left: 24, // Match search container padding
+    right: 24, // Match search container padding
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
-    maxHeight: 400,
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
-    zIndex: 1000,
+    zIndex: 999, // Lower than search bar
   },
   searchResultsTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1F2937',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   searchResultsScroll: {
-    maxHeight: 350,
+    maxHeight: 200, // Shorter to account for keyboard
   },
   searchResultsList: {
-    gap: 12,
+    gap: 8,
   },
   searchResultCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 10,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -441,25 +450,25 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   searchResultTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1F2937',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   searchResultCategory: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#6B7280',
   },
   searchResultArrow: {
     backgroundColor: '#FCE7F3',
     borderRadius: 20,
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
   searchResultArrowIcon: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#9333EA',
   },
   noResultsContainer: {
