@@ -25,6 +25,18 @@ export default function RootLayout() {
         <Stack.Screen name="ux-designer" options={{ headerShown: false }} />
         <Stack.Screen name="marketing-manager" options={{ headerShown: false }} />
         <Stack.Screen name="graphic-designer" options={{ headerShown: false }} />
+        <Stack.Screen name="research-scientist" options={{ headerShown: false }} />
+        <Stack.Screen name="biotech-engineer" options={{ headerShown: false }} />
+        <Stack.Screen name="environmental-scientist" options={{ headerShown: false }} />
+        <Stack.Screen name="software-engineer" options={{ headerShown: false }} />
+        <Stack.Screen name="product-manager" options={{ headerShown: false }} />
+        <Stack.Screen name="devops-engineer" options={{ headerShown: false }} />
+        <Stack.Screen name="illustrator" options={{ headerShown: false }} />
+        <Stack.Screen name="art-director" options={{ headerShown: false }} />
+        <Stack.Screen name="animator" options={{ headerShown: false }} />
+        <Stack.Screen name="financial-manager" options={{ headerShown: false }} />
+        <Stack.Screen name="investment-banker" options={{ headerShown: false }} />
+        <Stack.Screen name="sales-manager" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

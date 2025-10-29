@@ -65,6 +65,12 @@ export default function TechnologyPage() {
               onPress={() => {
                 if (career.title === 'UX Designer') {
                   router.push('/ux-designer' as any);
+                } else if (career.title === 'Software Engineer') {
+                  router.push('/software-engineer' as any);
+                } else if (career.title === 'Product Manager') {
+                  router.push('/product-manager' as any);
+                } else if (career.title === 'DevOps Engineer') {
+                  router.push('/devops-engineer' as any);
                 }
               }}
             >

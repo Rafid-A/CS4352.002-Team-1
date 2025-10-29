@@ -63,7 +63,13 @@ export default function BusinessPage() {
               style={styles.careerCard}
               activeOpacity={0.8}
               onPress={() => {
-                if (career.title === 'Marketing Manager') {
+                if (career.title === 'Financial Manager') {
+                  router.push('/financial-manager' as any);
+                } else if (career.title === 'Investment Banker') {
+                  router.push('/investment-banker' as any);
+                } else if (career.title === 'Sales Manager') {
+                  router.push('/sales-manager' as any);
+                } else if (career.title === 'Marketing Manager') {
                   router.push('/marketing-manager' as any);
                 }
               }}

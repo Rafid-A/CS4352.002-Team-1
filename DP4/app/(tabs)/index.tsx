@@ -21,6 +21,64 @@ export default function PathFinderApp() {
     { title: 'Graphic Designer', category: 'Arts' }
   ];
 
+  // Complete list of all careers for search
+  const allCareers = [
+    // Sciences
+    { title: 'Data Scientist', category: 'Sciences', route: '/data-scientist' },
+    { title: 'Research Scientist', category: 'Sciences', route: '/research-scientist' },
+    { title: 'Biotech Engineer', category: 'Sciences', route: '/biotech-engineer' },
+    { title: 'Environmental Scientist', category: 'Sciences', route: '/environmental-scientist' },
+    // Technology
+    { title: 'UX Designer', category: 'Technology', route: '/ux-designer' },
+    { title: 'Software Engineer', category: 'Technology', route: '/software-engineer' },
+    { title: 'Product Manager', category: 'Technology', route: '/product-manager' },
+    { title: 'DevOps Engineer', category: 'Technology', route: '/devops-engineer' },
+    // Arts
+    { title: 'Illustrator', category: 'Arts', route: '/illustrator' },
+    { title: 'Art Director', category: 'Arts', route: '/art-director' },
+    { title: 'Animator', category: 'Arts', route: '/animator' },
+    { title: 'Graphic Designer', category: 'Arts', route: '/graphic-designer' },
+    // Business
+    { title: 'Financial Manager', category: 'Business', route: '/financial-manager' },
+    { title: 'Investment Banker', category: 'Business', route: '/investment-banker' },
+    { title: 'Sales Manager', category: 'Business', route: '/sales-manager' },
+    { title: 'Marketing Manager', category: 'Business', route: '/marketing-manager' },
+  ];
+
+  // Filter and sort careers based on search query
+  const filteredCareers = searchQuery.trim()
+    ? allCareers
+        .filter(career =>
+          career.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          career.category.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => {
+          const query = searchQuery.toLowerCase();
+          const aTitle = a.title.toLowerCase();
+          const bTitle = b.title.toLowerCase();
+          
+          // Priority 1: Exact match at the start of the title
+          const aStartsWith = aTitle.startsWith(query);
+          const bStartsWith = bTitle.startsWith(query);
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          
+          // Priority 2: Any word in the title starts with the query
+          const aWordStartsWith = aTitle.split(' ').some(word => word.startsWith(query));
+          const bWordStartsWith = bTitle.split(' ').some(word => word.startsWith(query));
+          if (aWordStartsWith && !bWordStartsWith) return -1;
+          if (!aWordStartsWith && bWordStartsWith) return 1;
+          
+          // Priority 3: Position of match (earlier is better)
+          const aIndex = aTitle.indexOf(query);
+          const bIndex = bTitle.indexOf(query);
+          if (aIndex !== bIndex) return aIndex - bIndex;
+          
+          // Default: Alphabetical order
+          return aTitle.localeCompare(bTitle);
+        })
+    : [];
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -40,6 +98,51 @@ export default function PathFinderApp() {
               placeholderTextColor="#9CA3AF"
             />
           </View>
+
+          {/* Search Results Dropdown */}
+          {searchQuery.trim() !== '' && (
+            <View style={styles.searchResultsDropdown}>
+              {filteredCareers.length > 0 ? (
+                <>
+                  <Text style={styles.searchResultsTitle}>
+                    Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
+                  </Text>
+                  <ScrollView 
+                    style={styles.searchResultsScroll}
+                    showsVerticalScrollIndicator={false}
+                    nestedScrollEnabled={true}
+                  >
+                    <View style={styles.searchResultsList}>
+                      {filteredCareers.map((career, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.searchResultCard}
+                          activeOpacity={0.8}
+                          onPress={() => {
+                            router.push(career.route as any);
+                            setSearchQuery(''); // Clear search after selection
+                          }}
+                        >
+                          <View>
+                            <Text style={styles.searchResultTitle}>{career.title}</Text>
+                            <Text style={styles.searchResultCategory}>{career.category}</Text>
+                          </View>
+                          <View style={styles.searchResultArrow}>
+                            <Text style={styles.searchResultArrowIcon}>→</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </ScrollView>
+                </>
+              ) : (
+                <View style={styles.noResultsContainer}>
+                  <Text style={styles.noResultsText}>No careers found for "{searchQuery}"</Text>
+                  <Text style={styles.noResultsSubtext}>Try searching for a different career or category</Text>
+                </View>
+              )}
+            </View>
+          )}
         </View>
 
         <View style={styles.quizContainer}>
@@ -152,6 +255,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 24,
     marginBottom: 24,
+    position: 'relative',
+    zIndex: 1000,
   },
   searchBar: {
     backgroundColor: '#F3F4F6',
@@ -295,5 +400,86 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 16,
+  },
+  // Search Results Styles
+  searchResultsDropdown: {
+    position: 'absolute',
+    top: 60, // Position below the search bar
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    maxHeight: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 1000,
+  },
+  searchResultsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 12,
+  },
+  searchResultsScroll: {
+    maxHeight: 350,
+  },
+  searchResultsList: {
+    gap: 12,
+  },
+  searchResultCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  searchResultTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  searchResultCategory: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  searchResultArrow: {
+    backgroundColor: '#FCE7F3',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchResultArrowIcon: {
+    fontSize: 20,
+    color: '#9333EA',
+  },
+  noResultsContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  noResultsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
   },
 });

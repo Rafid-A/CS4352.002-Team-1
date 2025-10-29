@@ -65,6 +65,12 @@ export default function SciencesPage() {
               onPress={() => {
                 if (career.title === 'Data Scientist') {
                   router.push('/data-scientist' as any);
+                } else if (career.title === 'Research Scientist') {
+                  router.push('/research-scientist' as any);
+                } else if (career.title === 'Biotech Engineer') {
+                  router.push('/biotech-engineer' as any);
+                } else if (career.title === 'Environmental Scientist') {
+                  router.push('/environmental-scientist' as any);
                 }
               }}
             >

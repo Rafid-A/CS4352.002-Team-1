@@ -63,7 +63,13 @@ export default function ArtsPage() {
               style={styles.careerCard}
               activeOpacity={0.8}
               onPress={() => {
-                if (career.title === 'Graphic Designer') {
+                if (career.title === 'Illustrator') {
+                  router.push('/illustrator' as any);
+                } else if (career.title === 'Art Director') {
+                  router.push('/art-director' as any);
+                } else if (career.title === 'Animator') {
+                  router.push('/animator' as any);
+                } else if (career.title === 'Graphic Designer') {
                   router.push('/graphic-designer' as any);
                 }
               }}
