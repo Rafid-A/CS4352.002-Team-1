@@ -19,7 +19,12 @@ export default function RootLayout() {
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         <Stack.Screen name="sciences" options={{ headerShown: false }} />
         <Stack.Screen name="technology" options={{ headerShown: false }} />
+        <Stack.Screen name="arts" options={{ headerShown: false }} />
+        <Stack.Screen name="business" options={{ headerShown: false }} />
         <Stack.Screen name="data-scientist" options={{ headerShown: false }} />
+        <Stack.Screen name="ux-designer" options={{ headerShown: false }} />
+        <Stack.Screen name="marketing-manager" options={{ headerShown: false }} />
+        <Stack.Screen name="graphic-designer" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

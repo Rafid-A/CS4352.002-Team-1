@@ -62,6 +62,11 @@ export default function TechnologyPage() {
               key={index} 
               style={styles.careerCard}
               activeOpacity={0.8}
+              onPress={() => {
+                if (career.title === 'UX Designer') {
+                  router.push('/ux-designer' as any);
+                }
+              }}
             >
               <View style={styles.careerInfo}>
                 <Text style={styles.careerTitle}>{career.title}</Text>

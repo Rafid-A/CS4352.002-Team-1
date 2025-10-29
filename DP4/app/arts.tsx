@@ -2,31 +2,31 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function SciencesPage() {
+export default function ArtsPage() {
   const router = useRouter();
 
   const careers = [
     {
-      title: 'Data Scientist',
-      salary: '$90K - $150K',
-      growth: 'Very High Growth',
-      growthColor: '#22C55E'
+      title: 'Illustrator',
+      salary: '$45K - $85K',
+      growth: 'Medium Growth',
+      growthColor: '#3B82F6'
     },
     {
-      title: 'Research Scientist',
-      salary: '$70K - $120K',
+      title: 'Art Director',
+      salary: '$70K - $130K',
       growth: 'High Growth',
       growthColor: '#9333EA'
     },
     {
-      title: 'Biotech Engineer',
-      salary: '$75K - $130K',
+      title: 'Animator',
+      salary: '$55K - $95K',
       growth: 'High Growth',
       growthColor: '#9333EA'
     },
     {
-      title: 'Environmental Scientist',
-      salary: '$60K - $100K',
+      title: 'Graphic Designer',
+      salary: '$40K - $75K',
       growth: 'Medium Growth',
       growthColor: '#3B82F6'
     }
@@ -49,9 +49,9 @@ export default function SciencesPage() {
 
         {/* Title Section */}
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Sciences</Text>
+          <Text style={styles.title}>Arts</Text>
           <Text style={styles.subtitle}>
-            Explore careers in research, healthcare, and scientific innovation
+            Discover creative careers in design, illustration, and visual arts
           </Text>
         </View>
 
@@ -63,8 +63,8 @@ export default function SciencesPage() {
               style={styles.careerCard}
               activeOpacity={0.8}
               onPress={() => {
-                if (career.title === 'Data Scientist') {
-                  router.push('/data-scientist' as any);
+                if (career.title === 'Graphic Designer') {
+                  router.push('/graphic-designer' as any);
                 }
               }}
             >
@@ -256,3 +256,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+

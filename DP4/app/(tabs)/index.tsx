@@ -64,9 +64,13 @@ export default function PathFinderApp() {
                 activeOpacity={0.8}
                 onPress={() => {
                   if (interest.name === 'Sciences') {
-                    router.push('/sciences');
+                    router.push('/sciences' as any);
                   } else if (interest.name === 'Technology') {
-                    router.push('/technology');
+                    router.push('/technology' as any);
+                  } else if (interest.name === 'Arts') {
+                    router.push('/arts' as any);
+                  } else if (interest.name === 'Business') {
+                    router.push('/business' as any);
                   }
                 }}
               >
@@ -86,7 +90,13 @@ export default function PathFinderApp() {
               activeOpacity={0.8}
               onPress={() => {
                 if (career.title === 'Data Scientist') {
-                  router.push('/data-scientist');
+                  router.push('/data-scientist' as any);
+                } else if (career.title === 'UX Designer') {
+                  router.push('/ux-designer' as any);
+                } else if (career.title === 'Marketing Manager') {
+                  router.push('/marketing-manager' as any);
+                } else if (career.title === 'Graphic Designer') {
+                  router.push('/graphic-designer' as any);
                 }
               }}
               >

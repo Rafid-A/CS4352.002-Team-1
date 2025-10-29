@@ -2,33 +2,33 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function SciencesPage() {
+export default function BusinessPage() {
   const router = useRouter();
 
   const careers = [
     {
-      title: 'Data Scientist',
-      salary: '$90K - $150K',
+      title: 'Financial Manager',
+      salary: '$85K - $150K',
+      growth: 'High Growth',
+      growthColor: '#9333EA'
+    },
+    {
+      title: 'Investment Banker',
+      salary: '$100K - $200K',
       growth: 'Very High Growth',
       growthColor: '#22C55E'
     },
     {
-      title: 'Research Scientist',
-      salary: '$70K - $120K',
+      title: 'Sales Manager',
+      salary: '$65K - $125K',
       growth: 'High Growth',
       growthColor: '#9333EA'
     },
     {
-      title: 'Biotech Engineer',
-      salary: '$75K - $130K',
+      title: 'Marketing Manager',
+      salary: '$60K - $115K',
       growth: 'High Growth',
       growthColor: '#9333EA'
-    },
-    {
-      title: 'Environmental Scientist',
-      salary: '$60K - $100K',
-      growth: 'Medium Growth',
-      growthColor: '#3B82F6'
     }
   ];
 
@@ -49,9 +49,9 @@ export default function SciencesPage() {
 
         {/* Title Section */}
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Sciences</Text>
+          <Text style={styles.title}>Business</Text>
           <Text style={styles.subtitle}>
-            Explore careers in research, healthcare, and scientific innovation
+            Explore careers in finance, management, and entrepreneurship
           </Text>
         </View>
 
@@ -63,8 +63,8 @@ export default function SciencesPage() {
               style={styles.careerCard}
               activeOpacity={0.8}
               onPress={() => {
-                if (career.title === 'Data Scientist') {
-                  router.push('/data-scientist' as any);
+                if (career.title === 'Marketing Manager') {
+                  router.push('/marketing-manager' as any);
                 }
               }}
             >
@@ -256,3 +256,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
