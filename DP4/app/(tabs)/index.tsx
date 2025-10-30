@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 export default function PathFinderApp() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const interests = [
     { name: 'Sciences', icon: '🔬' },
@@ -44,6 +45,12 @@ export default function PathFinderApp() {
     { title: 'Sales Manager', category: 'Business', route: '/sales-manager' },
     { title: 'Marketing Manager', category: 'Business', route: '/marketing-manager' },
   ];
+
+  // Handle logout - goes back to login page
+  const handleLogout = () => {
+    setMenuOpen(false);
+    router.replace('/login' as any);
+  };
 
   // Filter and sort careers based on search query
   const filteredCareers = searchQuery.trim()
@@ -87,8 +94,19 @@ export default function PathFinderApp() {
         scrollEnabled={searchQuery.trim() === ''}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>PathFinder</Text>
-          <Text style={styles.subtitle}>Discover your dream career path</Text>
+          <View style={styles.headerTop}>
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>PathFinder</Text>
+              <Text style={styles.subtitle}>Discover your dream career path</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.hamburgerButton}
+              onPress={() => setMenuOpen(!menuOpen)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.hamburgerIcon}>☰</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.searchContainer}>
@@ -177,6 +195,20 @@ export default function PathFinderApp() {
         </View>
       </ScrollView>
 
+      {/* Hamburger Dropdown Menu - Floating */}
+      {menuOpen && (
+        <View style={styles.dropdownMenu}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.menuItemIcon}>🚪</Text>
+            <Text style={styles.menuItemText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Search Results Dropdown - Outside ScrollView */}
       {searchQuery.trim() !== '' && (
         <View style={styles.searchResultsDropdown}>
@@ -251,6 +283,59 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     zIndex: 1001, // Above dropdown
     backgroundColor: '#FDF2F8', // Match container background
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  hamburgerButton: {
+    backgroundColor: '#F3E8FF',
+    borderRadius: 8,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  hamburgerIcon: {
+    fontSize: 24,
+    color: '#9333EA',
+    fontWeight: '600',
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 100, // Position below the hamburger button
+    right: 24, // Align with right edge
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    minWidth: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 1002, // Above everything else
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+  },
+  menuItemIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  menuItemText: {
+    fontSize: 15,
+    color: '#1F2937',
+    fontWeight: '500',
   },
   title: {
     fontSize: 28,
