@@ -37,6 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="financial-manager" options={{ headerShown: false }} />
         <Stack.Screen name="investment-banker" options={{ headerShown: false }} />
         <Stack.Screen name="sales-manager" options={{ headerShown: false }} />
+        <Stack.Screen name="quiz" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

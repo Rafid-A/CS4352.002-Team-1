@@ -98,7 +98,7 @@ export default function BusinessPage() {
           </Text>
           
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.quizButton} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
               <Text style={styles.quizButtonText}>Take Quiz</Text>
             </TouchableOpacity>
             

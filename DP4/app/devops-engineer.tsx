@@ -118,7 +118,7 @@ export default function DevOpsEngineerPage() {
           <Text style={styles.mentorButtonText}>Find a Mentor</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.quizButton} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
           <Text style={styles.quizButtonText}>Take Career Quiz</Text>
         </TouchableOpacity>
       </View>

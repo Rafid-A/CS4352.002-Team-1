@@ -105,7 +105,7 @@ export default function PathFinderApp() {
         </View>
 
         <View style={styles.quizContainer}>
-          <TouchableOpacity activeOpacity={0.8}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
             <View style={styles.quizCard}>
               <View style={styles.quizTextContainer}>
                 <Text style={styles.quizTitle}>Not sure where to start?</Text>
