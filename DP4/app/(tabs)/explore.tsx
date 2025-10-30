@@ -4,7 +4,6 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 export default function JobBoardScreen() {
   const [filter, setFilter] = useState('All');
 
-  // Realistic job listings based on app career paths
   const jobs = [
     {
       id: 1,
@@ -153,7 +152,6 @@ export default function JobBoardScreen() {
         <Text style={styles.subtitle}>Discover opportunities in your field</Text>
       </View>
 
-      {/* Category Filters */}
       <View style={styles.filterContainer}>
         <ScrollView 
           horizontal 
@@ -181,7 +179,6 @@ export default function JobBoardScreen() {
         </ScrollView>
       </View>
 
-      {/* Job Listings */}
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}

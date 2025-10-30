@@ -22,37 +22,29 @@ export default function PathFinderApp() {
     { title: 'Graphic Designer', category: 'Arts' }
   ];
 
-  // Complete list of all careers for search
   const allCareers = [
-    // Sciences
     { title: 'Data Scientist', category: 'Sciences', route: '/data-scientist' },
     { title: 'Research Scientist', category: 'Sciences', route: '/research-scientist' },
     { title: 'Biotech Engineer', category: 'Sciences', route: '/biotech-engineer' },
     { title: 'Environmental Scientist', category: 'Sciences', route: '/environmental-scientist' },
-    // Technology
     { title: 'UX Designer', category: 'Technology', route: '/ux-designer' },
     { title: 'Software Engineer', category: 'Technology', route: '/software-engineer' },
     { title: 'Product Manager', category: 'Technology', route: '/product-manager' },
     { title: 'DevOps Engineer', category: 'Technology', route: '/devops-engineer' },
-    // Arts
     { title: 'Illustrator', category: 'Arts', route: '/illustrator' },
     { title: 'Art Director', category: 'Arts', route: '/art-director' },
     { title: 'Animator', category: 'Arts', route: '/animator' },
     { title: 'Graphic Designer', category: 'Arts', route: '/graphic-designer' },
-    // Business
     { title: 'Financial Manager', category: 'Business', route: '/financial-manager' },
     { title: 'Investment Banker', category: 'Business', route: '/investment-banker' },
     { title: 'Sales Manager', category: 'Business', route: '/sales-manager' },
     { title: 'Marketing Manager', category: 'Business', route: '/marketing-manager' },
   ];
 
-  // Handle logout - goes back to login page
   const handleLogout = () => {
     setMenuOpen(false);
     router.replace('/login' as any);
   };
-
-  // Filter and sort careers based on search query
   const filteredCareers = searchQuery.trim()
     ? allCareers
         .filter(career =>
@@ -63,24 +55,20 @@ export default function PathFinderApp() {
           const aTitle = a.title.toLowerCase();
           const bTitle = b.title.toLowerCase();
           
-          // Priority 1: Exact match at the start of the title
           const aStartsWith = aTitle.startsWith(query);
           const bStartsWith = bTitle.startsWith(query);
           if (aStartsWith && !bStartsWith) return -1;
           if (!aStartsWith && bStartsWith) return 1;
           
-          // Priority 2: Any word in the title starts with the query
           const aWordStartsWith = aTitle.split(' ').some(word => word.startsWith(query));
           const bWordStartsWith = bTitle.split(' ').some(word => word.startsWith(query));
           if (aWordStartsWith && !bWordStartsWith) return -1;
           if (!aWordStartsWith && bWordStartsWith) return 1;
           
-          // Priority 3: Position of match (earlier is better)
           const aIndex = aTitle.indexOf(query);
           const bIndex = bTitle.indexOf(query);
           if (aIndex !== bIndex) return aIndex - bIndex;
           
-          // Default: Alphabetical order
           return aTitle.localeCompare(bTitle);
         })
     : [];
@@ -195,7 +183,6 @@ export default function PathFinderApp() {
         </View>
       </ScrollView>
 
-      {/* Hamburger Dropdown Menu - Floating */}
       {menuOpen && (
         <View style={styles.dropdownMenu}>
           <TouchableOpacity 
@@ -209,7 +196,6 @@ export default function PathFinderApp() {
         </View>
       )}
 
-      {/* Search Results Dropdown - Outside ScrollView */}
       {searchQuery.trim() !== '' && (
         <View style={styles.searchResultsDropdown}>
           {filteredCareers.length > 0 ? (

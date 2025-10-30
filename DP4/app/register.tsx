@@ -9,39 +9,30 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // This function handles registration
-  // Since it's a demo, any information will work!
   const handleRegister = () => {
-    // For demo mode, just check if basic fields have something
     if (username.trim() === '' || password.trim() === '') {
       Alert.alert('Oops!', 'Please enter at least a username and password');
       return;
     }
 
-    // Check if passwords match (if confirm password was entered)
     if (confirmPassword.trim() !== '' && password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match!');
       return;
     }
 
-    // Since this is a demo, we accept any information
-    // Navigate directly to the main app (tabs) - no extra popup!
     router.replace('/(tabs)' as any);
   };
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
-        {/* Header Section */}
         <View style={styles.header}>
           <Text style={styles.logo}>🎯</Text>
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join PathFinder and start exploring careers</Text>
         </View>
 
-        {/* Form Section */}
         <View style={styles.formContainer}>
-          {/* Username Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Username</Text>
             <TextInput
@@ -54,7 +45,6 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Email Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -68,7 +58,6 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Password Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <TextInput
@@ -81,7 +70,6 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Confirm Password Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Confirm Password</Text>
             <TextInput
@@ -94,7 +82,6 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Terms and Conditions */}
           <View style={styles.termsContainer}>
             <Text style={styles.termsText}>
               By creating an account, you agree to our{' '}
@@ -103,7 +90,6 @@ export default function RegisterScreen() {
             </Text>
           </View>
 
-          {/* Register Button */}
           <TouchableOpacity
             style={styles.registerButton}
             activeOpacity={0.8}
@@ -112,14 +98,12 @@ export default function RegisterScreen() {
             <Text style={styles.registerButtonText}>Create Account</Text>
           </TouchableOpacity>
 
-          {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>OR</Text>
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Sign In Link */}
           <View style={styles.signinContainer}>
             <Text style={styles.signinText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => router.back()}>

@@ -7,33 +7,24 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // This function handles the login
-  // Since it's a demo, any username and password will work!
   const handleLogin = () => {
-    // Check if fields are not empty
     if (username.trim() === '' || password.trim() === '') {
       Alert.alert('Oops!', 'Please enter both username and password');
       return;
     }
 
-    // Since this is a demo, we accept any username/password
-    // In a real app, you would check these against a database
-    // Navigate directly to the main app (tabs)
     router.replace('/(tabs)' as any);
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
       <View style={styles.header}>
         <Text style={styles.logo}>🎯</Text>
         <Text style={styles.title}>PathFinder</Text>
         <Text style={styles.subtitle}>Sign in to discover your career path</Text>
       </View>
 
-      {/* Form Section */}
       <View style={styles.formContainer}>
-        {/* Username Input */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Username</Text>
           <TextInput
@@ -46,7 +37,6 @@ export default function LoginScreen() {
           />
         </View>
 
-        {/* Password Input */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -59,12 +49,10 @@ export default function LoginScreen() {
           />
         </View>
 
-        {/* Forgot Password Link */}
         <TouchableOpacity style={styles.forgotPasswordContainer}>
           <Text style={styles.forgotPasswordText}>Forgot password?</Text>
         </TouchableOpacity>
 
-        {/* Login Button */}
         <TouchableOpacity
           style={styles.loginButton}
           activeOpacity={0.8}
@@ -73,14 +61,12 @@ export default function LoginScreen() {
           <Text style={styles.loginButtonText}>Sign In</Text>
         </TouchableOpacity>
 
-        {/* Divider */}
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>OR</Text>
           <View style={styles.dividerLine} />
         </View>
 
-        {/* Sign Up Link */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push('/register')}>
