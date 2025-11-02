@@ -41,7 +41,17 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="mentors"
+        options={{
+          title: 'Mentors',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 28 }}>👥</Text>
+          ),
+        }}
+      />
 
+      {/* Hidden Tab Pages - Show tab bar but not in tab list */}
       <Tabs.Screen name="sciences" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="technology" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="arts" options={{ href: null, headerShown: false }} />

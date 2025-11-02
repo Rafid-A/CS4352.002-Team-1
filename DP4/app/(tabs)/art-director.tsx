@@ -114,7 +114,11 @@ export default function ArtDirectorPage() {
 
       {/* Bottom Buttons */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.mentorButton} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.mentorButton} 
+          activeOpacity={0.8}
+          onPress={() => router.push('/mentors' as any)}
+        >
           <Text style={styles.mentorButtonText}>Find a Mentor</Text>
         </TouchableOpacity>
         

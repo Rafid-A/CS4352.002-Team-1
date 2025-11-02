@@ -244,13 +244,16 @@ export default function PathFinderApp() {
         </View>
       )}
 
-      <View style={styles.mentorButtonContainer}>
-        <TouchableOpacity activeOpacity={0.9}>
+      {/* <View style={styles.mentorButtonContainer}>
+        <TouchableOpacity 
+          activeOpacity={0.9}
+          onPress={() => router.push('/mentors' as any)}
+        >
           <View style={styles.mentorButton}>
             <Text style={styles.mentorButtonText}>Find a Mentor</Text>
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }

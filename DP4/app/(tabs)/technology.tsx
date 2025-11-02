@@ -102,7 +102,11 @@ export default function TechnologyPage() {
               <Text style={styles.quizButtonText}>Take Quiz</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.mentorButton} activeOpacity={0.8}>
+            <TouchableOpacity 
+              style={styles.mentorButton} 
+              activeOpacity={0.8}
+              onPress={() => router.push('/mentors' as any)}
+            >
               <Text style={styles.mentorButtonText}>Find Mentor</Text>
             </TouchableOpacity>
           </View>
