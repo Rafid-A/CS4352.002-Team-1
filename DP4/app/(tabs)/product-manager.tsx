@@ -121,6 +121,14 @@ export default function ProductManagerPage() {
         >
           <Text style={styles.mentorButtonText}>Find a Mentor</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.coursesButton} 
+          activeOpacity={0.8}
+          onPress={() => router.push('/courses?career=product-manager' as any)}
+        >
+          <Text style={styles.coursesButtonText}>View Courses & Certifications</Text>
+        </TouchableOpacity>
         
         <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
           <Text style={styles.quizButtonText}>Take Career Quiz</Text>
@@ -306,6 +314,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mentorButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  coursesButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  coursesButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 16,

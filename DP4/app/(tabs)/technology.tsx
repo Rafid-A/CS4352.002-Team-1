@@ -97,17 +97,25 @@ export default function TechnologyPage() {
             Take our career quiz or connect with a mentor to find the perfect path for you.
           </Text>
           
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
-              <Text style={styles.quizButtonText}>Take Quiz</Text>
-            </TouchableOpacity>
-            
+          <View style={styles.buttonColumn}>
             <TouchableOpacity 
               style={styles.mentorButton} 
               activeOpacity={0.8}
               onPress={() => router.push('/mentors' as any)}
             >
               <Text style={styles.mentorButtonText}>Find Mentor</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.coursesButton} 
+              activeOpacity={0.8}
+              onPress={() => router.push('/courses?category=technology' as any)}
+            >
+              <Text style={styles.coursesButtonText}>Browse Courses</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
+              <Text style={styles.quizButtonText}>Take Career Quiz</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -237,32 +245,42 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 20,
   },
-  buttonRow: {
-    flexDirection: 'row',
+  buttonColumn: {
     gap: 12,
   },
-  quizButton: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  quizButtonText: {
-    color: '#1F2937',
-    fontWeight: '600',
-    fontSize: 15,
-  },
   mentorButton: {
-    flex: 1,
-    backgroundColor: '#D946EF',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: '#9333EA',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
   },
   mentorButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 15,
+    fontSize: 16,
+  },
+  coursesButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  coursesButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  quizButton: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#9333EA',
+  },
+  quizButtonText: {
+    color: '#9333EA',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
