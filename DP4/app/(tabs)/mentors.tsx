@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function MentorsScreen() {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const mentors = [
     {
@@ -232,6 +233,15 @@ export default function MentorsScreen() {
     },
   ];
 
+  const filteredMentors = mentors.filter((mentor) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      mentor.name.toLowerCase().includes(query) ||
+      mentor.title.toLowerCase().includes(query) ||
+      mentor.company.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -246,6 +256,26 @@ export default function MentorsScreen() {
         
         <Text style={styles.title}>Find Your Mentor</Text>
         <Text style={styles.subtitle}>Connect with experienced professionals in your field</Text>
+
+        <View style={styles.searchContainer}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name, position, or company..."
+            placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              style={styles.clearButton}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.clearIcon}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView 
@@ -253,7 +283,13 @@ export default function MentorsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {mentors.map((mentor) => (
+        {filteredMentors.length === 0 ? (
+          <View style={styles.noResults}>
+            <Text style={styles.noResultsText}>No mentors found</Text>
+            <Text style={styles.noResultsSubtext}>Try adjusting your search</Text>
+          </View>
+        ) : (
+          filteredMentors.map((mentor) => (
           <View key={mentor.id} style={styles.mentorCard}>
             <View style={styles.mentorHeader}>
               <View style={styles.avatar}>
@@ -294,12 +330,14 @@ export default function MentorsScreen() {
             <TouchableOpacity 
               style={styles.connectButton}
               activeOpacity={0.8}
+              onPress={() => router.push(`/chat-mentor?mentorId=${mentor.id}` as any)}
             >
               <Text style={styles.connectIcon}>💬</Text>
               <Text style={styles.connectText}>Connect with {mentor.name.split(' ')[0]}</Text>
             </TouchableOpacity>
           </View>
-        ))}
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -463,6 +501,51 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1F2937',
+  },
+  clearButton: {
+    padding: 4,
+  },
+  clearIcon: {
+    fontSize: 18,
+    color: '#9CA3AF',
+  },
+  noResults: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  noResultsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
   },
 });
 
