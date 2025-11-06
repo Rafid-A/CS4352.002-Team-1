@@ -8,7 +8,9 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
-/config/gemini.ts
+
+# API Keys
+config/gemini.ts
 
 # Native
 .kotlin/
