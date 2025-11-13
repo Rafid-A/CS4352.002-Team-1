@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 const quizQuestions = [
   {
@@ -124,6 +124,9 @@ const careerRecommendations = {
 
 export default function QuizPage() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
+  const currentRoute = '/(tabs)/quiz';
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -197,7 +200,7 @@ export default function QuizPage() {
       <View style={styles.container}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={styles.backButton}>
               <Text style={styles.backIcon}>←</Text>
               <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
@@ -216,7 +219,7 @@ export default function QuizPage() {
                 <TouchableOpacity
                   key={index}
                   style={styles.careerCard}
-                  onPress={() => router.push(career.route as any)}
+                  onPress={() => router.push({ pathname: career.route, params: { from: currentRoute } } as any)}
                 >
                   <Text style={styles.careerTitle}>{career.title}</Text>
                   <View style={styles.careerArrow}>
@@ -254,7 +257,7 @@ export default function QuizPage() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={styles.backButton}>
             <Text style={styles.backIcon}>←</Text>
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>

@@ -1,10 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { favoriteMentorsStorage } from '../../utils/storage';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function MentorsScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
   const [searchQuery, setSearchQuery] = useState('');
+  const [favoritedMentorIds, setFavoritedMentorIds] = useState<Set<number>>(new Set());
+  const { colors } = useTheme();
+
+  // Load favorited mentors when page is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadFavorites = async () => {
+        const favorites = await favoriteMentorsStorage.get();
+        const ids = new Set(favorites.map(m => m.id));
+        setFavoritedMentorIds(ids);
+      };
+      loadFavorites();
+    }, [])
+  );
+
+  // Toggle favorite status
+  const toggleFavorite = async (mentor: any) => {
+    const isFavorited = favoritedMentorIds.has(mentor.id);
+    
+    if (isFavorited) {
+      await favoriteMentorsStorage.remove(mentor.id);
+      setFavoritedMentorIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(mentor.id);
+        return newSet;
+      });
+    } else {
+      await favoriteMentorsStorage.add(mentor);
+      setFavoritedMentorIds(prev => new Set(prev).add(mentor.id));
+    }
+  };
 
   const mentors = [
     {
@@ -243,26 +278,26 @@ export default function MentorsScreen() {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBackground }]}>
         <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
+          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
+          onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
           activeOpacity={0.7}
         >
           <Text style={styles.backIcon}>←</Text>
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         
-        <Text style={styles.title}>Find Your Mentor</Text>
-        <Text style={styles.subtitle}>Connect with experienced professionals in your field</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Find Your Mentor</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Connect with experienced professionals in your field</Text>
 
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Search by name, position, or company..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -272,7 +307,7 @@ export default function MentorsScreen() {
               style={styles.clearButton}
               activeOpacity={0.7}
             >
-              <Text style={styles.clearIcon}>✕</Text>
+              <Text style={[styles.clearIcon, { color: colors.textTertiary }]}>✕</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -285,43 +320,52 @@ export default function MentorsScreen() {
       >
         {filteredMentors.length === 0 ? (
           <View style={styles.noResults}>
-            <Text style={styles.noResultsText}>No mentors found</Text>
-            <Text style={styles.noResultsSubtext}>Try adjusting your search</Text>
+            <Text style={[styles.noResultsText, { color: colors.text }]}>No mentors found</Text>
+            <Text style={[styles.noResultsSubtext, { color: colors.textSecondary }]}>Try adjusting your search</Text>
           </View>
         ) : (
           filteredMentors.map((mentor) => (
-          <View key={mentor.id} style={styles.mentorCard}>
+          <View key={mentor.id} style={[styles.mentorCard, { backgroundColor: colors.cardBackground }]}>
             <View style={styles.mentorHeader}>
-              <View style={styles.avatar}>
+              <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
                 <Text style={styles.avatarText}>{mentor.initials}</Text>
               </View>
               <View style={styles.mentorInfo}>
-                <Text style={styles.mentorName}>{mentor.name}</Text>
-                <Text style={styles.mentorTitle}>{mentor.title}</Text>
+                <Text style={[styles.mentorName, { color: colors.text }]}>{mentor.name}</Text>
+                <Text style={[styles.mentorTitle, { color: colors.textSecondary }]}>{mentor.title}</Text>
                 <View style={styles.ratingContainer}>
                   <Text style={styles.star}>⭐</Text>
                   <Text style={styles.rating}>{mentor.rating}</Text>
-                  <Text style={styles.sessions}> • {mentor.sessions} sessions</Text>
+                  <Text style={[styles.sessions, { color: colors.textTertiary }]}> • {mentor.sessions} sessions</Text>
                 </View>
               </View>
+              <TouchableOpacity 
+                style={styles.favoriteButton}
+                onPress={() => toggleFavorite(mentor)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.favoriteIcon}>
+                  {favoritedMentorIds.has(mentor.id) ? '❤️' : '🤍'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.mentorDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailIcon}>🏢</Text>
-                <Text style={styles.detailText}>{mentor.company} • {mentor.years} years</Text>
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>{mentor.company} • {mentor.years} years</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailIcon}>📍</Text>
-                <Text style={styles.detailText}>{mentor.location}</Text>
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>{mentor.location}</Text>
               </View>
             </View>
 
-            <Text style={styles.bio}>{mentor.bio}</Text>
+            <Text style={[styles.bio, { color: colors.textSecondary }]}>{mentor.bio}</Text>
 
             <View style={styles.skills}>
               {mentor.skills.map((skill, index) => (
-                <View key={index} style={styles.skillBadge}>
+                <View key={index} style={[styles.skillBadge, { backgroundColor: colors.primaryLight }]}>
                   <Text style={styles.skillText}>{skill}</Text>
                 </View>
               ))}
@@ -417,6 +461,13 @@ const styles = StyleSheet.create({
   mentorInfo: {
     flex: 1,
     justifyContent: 'center',
+  },
+  favoriteButton: {
+    padding: 8,
+    alignSelf: 'flex-start',
+  },
+  favoriteIcon: {
+    fontSize: 24,
   },
   mentorName: {
     fontSize: 18,

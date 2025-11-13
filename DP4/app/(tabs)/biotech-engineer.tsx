@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 export default function BiotechEngineerPage() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
+  const currentRoute = '/(tabs)/biotech-engineer';
 
   const responsibilities = [
     'Design biotechnology equipment and processes',
@@ -27,7 +30,7 @@ export default function BiotechEngineerPage() {
         {/* Header with Back Button */}
         <View style={styles.header}>
           <TouchableOpacity 
-            onPress={() => router.back()} 
+            onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} 
             style={styles.backButton}
             activeOpacity={0.7}
           >
@@ -117,7 +120,7 @@ export default function BiotechEngineerPage() {
         <TouchableOpacity 
           style={styles.mentorButton} 
           activeOpacity={0.8}
-          onPress={() => router.push('/mentors' as any)}
+          onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
         >
           <Text style={styles.mentorButtonText}>Find a Mentor</Text>
         </TouchableOpacity>
@@ -130,7 +133,7 @@ export default function BiotechEngineerPage() {
           <Text style={styles.coursesButtonText}>View Courses & Certifications</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
+        <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push({ pathname: '/(tabs)/quiz', params: { from: currentRoute } } as any)}>
           <Text style={styles.quizButtonText}>Take Career Quiz</Text>
         </TouchableOpacity>
       </View>

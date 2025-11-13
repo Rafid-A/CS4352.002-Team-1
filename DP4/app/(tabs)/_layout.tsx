@@ -1,14 +1,43 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { savedJobsStorage, favoriteMentorsStorage, savedCoursesStorage } from '../../utils/storage';
+import { savedJobs, favoriteMentors, savedCourses } from '../../data/savedData';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  // Initialize storage with sample data on first load
+  useEffect(() => {
+    const initializeStorage = async () => {
+      try {
+        // Check if data already exists
+        const existingJobs = await savedJobsStorage.get();
+        const existingMentors = await favoriteMentorsStorage.get();
+        const existingCourses = await savedCoursesStorage.get();
+
+        // Only add sample data if storage is empty
+        if (existingJobs.length === 0) {
+          await savedJobsStorage.set(savedJobs);
+        }
+        if (existingMentors.length === 0) {
+          await favoriteMentorsStorage.set(favoriteMentors);
+        }
+        if (existingCourses.length === 0) {
+          await savedCoursesStorage.set(savedCourses);
+        }
+      } catch (error) {
+        console.log('Error initializing storage:', error);
+      }
+    };
+
+    initializeStorage();
+  }, []);
 
   return (
     <Tabs
@@ -59,8 +88,21 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 28 }}>👤</Text>
+          ),
+        }}
+      />
 
       {/* Hidden Tab Pages - Show tab bar but not in tab list */}
+      <Tabs.Screen name="chat" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="saved-jobs" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="favorite-mentors" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="saved-courses" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="sciences" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="technology" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="arts" options={{ href: null, headerShown: false }} />

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../../context/ThemeContext';
 
 
 export default function PathFinderApp() {
   const router = useRouter();
+  const currentRoute = '/(tabs)/';
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const { colors } = useTheme();
 
   const interests = [
     { name: 'Sciences', icon: '🔬' },
@@ -20,6 +23,20 @@ export default function PathFinderApp() {
     { title: 'Data Scientist', category: 'Technology' },
     { title: 'Marketing Manager', category: 'Business' },
     { title: 'Graphic Designer', category: 'Arts' }
+  ];
+
+  const popularMentors = [
+    { id: 1, name: 'Sarah Chen', title: 'Senior UX Designer', company: 'Tech Corp', initials: 'SC', rating: 4.9 },
+    { id: 5, name: 'Jennifer Park', title: 'Principal Software Engineer', company: 'CloudTech', initials: 'JP', rating: 4.9 },
+    { id: 3, name: 'Emily Watson', title: 'Creative Director', company: 'Design Studio', initials: 'EW', rating: 5.0 },
+    { id: 4, name: 'David Kim', title: 'Data Science Manager', company: 'Analytics Inc', initials: 'DK', rating: 4.7 },
+  ];
+
+  const popularCourses = [
+    { id: 1, title: 'Google UX Design Professional Certificate', provider: 'Google', level: 'Beginner', duration: '6 months' },
+    { id: 2, title: 'IBM Data Science Professional Certificate', provider: 'IBM', level: 'Beginner', duration: '5 months' },
+    { id: 20, title: 'Full Stack Web Development', provider: 'The Odin Project', level: 'Intermediate', duration: '6 months' },
+    { id: 4, title: 'Google Digital Marketing Certificate', provider: 'Google', level: 'Beginner', duration: '6 months' },
   ];
 
   const allCareers = [
@@ -74,21 +91,21 @@ export default function PathFinderApp() {
     : [];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView 
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         scrollEnabled={searchQuery.trim() === ''}
       >
-        <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: colors.background }]}>
           <View style={styles.headerTop}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.title}>PathFinder</Text>
-              <Text style={styles.subtitle}>Discover your dream career path</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Discover your dream career path</Text>
             </View>
             <TouchableOpacity 
-              style={styles.hamburgerButton}
+              style={[styles.hamburgerButton, { backgroundColor: colors.primaryLight }]}
               onPress={() => setMenuOpen(!menuOpen)}
               activeOpacity={0.7}
             >
@@ -97,21 +114,21 @@ export default function PathFinderApp() {
           </View>
         </View>
 
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
+          <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               placeholder="Search career paths and interests..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              style={styles.searchInput}
-              placeholderTextColor="#9CA3AF"
+              style={[styles.searchInput, { color: colors.text }]}
+              placeholderTextColor={colors.textTertiary}
             />
           </View>
         </View>
 
         <View style={styles.quizContainer}>
-          <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => router.push({ pathname: '/(tabs)/quiz', params: { from: currentRoute } } as any)}>
             <View style={styles.quizCard}>
               <View style={styles.quizTextContainer}>
                 <Text style={styles.quizTitle}>Not sure where to start?</Text>
@@ -123,7 +140,7 @@ export default function PathFinderApp() {
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Explore by Interest</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore by Interest</Text>
           <View style={styles.interestGrid}>
             {interests.map((interest, index) => (
               <TouchableOpacity
@@ -132,25 +149,25 @@ export default function PathFinderApp() {
                 activeOpacity={0.8}
                 onPress={() => {
                   if (interest.name === 'Sciences') {
-                    router.push('/sciences' as any);
+                    router.push({ pathname: '/(tabs)/sciences', params: { from: currentRoute } } as any);
                   } else if (interest.name === 'Technology') {
-                    router.push('/technology' as any);
+                    router.push({ pathname: '/(tabs)/technology', params: { from: currentRoute } } as any);
                   } else if (interest.name === 'Arts') {
-                    router.push('/arts' as any);
+                    router.push({ pathname: '/(tabs)/arts', params: { from: currentRoute } } as any);
                   } else if (interest.name === 'Business') {
-                    router.push('/business' as any);
+                    router.push({ pathname: '/(tabs)/business', params: { from: currentRoute } } as any);
                   }
                 }}
               >
                 <Text style={styles.interestIcon}>{interest.icon}</Text>
-                <Text style={styles.interestName}>{interest.name}</Text>
+                <Text style={[styles.interestName, { color: colors.text }]}>{interest.name}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         <View style={styles.careerSection}>
-          <Text style={styles.sectionTitle}>Popular Career Paths</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Popular Career Paths</Text>
           <View style={styles.careerList}>
             {careerPaths.map((career, index) => (
               <TouchableOpacity 
@@ -158,22 +175,22 @@ export default function PathFinderApp() {
               activeOpacity={0.8}
               onPress={() => {
                 if (career.title === 'Data Scientist') {
-                  router.push('/data-scientist' as any);
+                  router.push({ pathname: '/(tabs)/data-scientist', params: { from: currentRoute } } as any);
                 } else if (career.title === 'UX Designer') {
-                  router.push('/ux-designer' as any);
+                  router.push({ pathname: '/(tabs)/ux-designer', params: { from: currentRoute } } as any);
                 } else if (career.title === 'Marketing Manager') {
-                  router.push('/marketing-manager' as any);
+                  router.push({ pathname: '/(tabs)/marketing-manager', params: { from: currentRoute } } as any);
                 } else if (career.title === 'Graphic Designer') {
-                  router.push('/graphic-designer' as any);
+                  router.push({ pathname: '/(tabs)/graphic-designer', params: { from: currentRoute } } as any);
                 }
               }}
               >
-                <View style={styles.careerCard}>
+                <View style={[styles.careerCard, { backgroundColor: colors.cardBackground }]}>
                   <View>
-                    <Text style={styles.careerTitle}>{career.title}</Text>
-                    <Text style={styles.careerCategory}>{career.category}</Text>
+                    <Text style={[styles.careerTitle, { color: colors.text }]}>{career.title}</Text>
+                    <Text style={[styles.careerCategory, { color: colors.textSecondary }]}>{career.category}</Text>
                   </View>
-                  <View style={styles.arrowContainer}>
+                  <View style={[styles.arrowContainer, { backgroundColor: colors.primaryLight }]}>
                     <Text style={styles.arrowIcon}>→</Text>
                   </View>
                 </View>
@@ -181,26 +198,101 @@ export default function PathFinderApp() {
             ))}
           </View>
         </View>
+
+        {/* Popular Mentors Section */}
+        <View style={styles.mentorSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Popular Mentors</Text>
+            <TouchableOpacity 
+              onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.viewAllText}>View All →</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScroll}
+          >
+            {popularMentors.map((mentor) => (
+              <TouchableOpacity 
+                key={mentor.id}
+                style={[styles.mentorCard, { backgroundColor: colors.cardBackground }]}
+                activeOpacity={0.8}
+                onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
+              >
+                <View style={[styles.mentorAvatar, { backgroundColor: colors.primaryLight }]}>
+                  <Text style={styles.mentorAvatarText}>{mentor.initials}</Text>
+                </View>
+                <Text style={[styles.mentorName, { color: colors.text }]}>{mentor.name}</Text>
+                <Text style={[styles.mentorTitle, { color: colors.textSecondary }]}>{mentor.title}</Text>
+                <Text style={[styles.mentorCompany, { color: colors.textTertiary }]}>{mentor.company}</Text>
+                <View style={styles.mentorRating}>
+                  <Text style={styles.mentorStar}>⭐</Text>
+                  <Text style={styles.mentorRatingText}>{mentor.rating}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Popular Courses Section */}
+        <View style={styles.courseSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Popular Courses</Text>
+            <TouchableOpacity 
+              onPress={() => router.push({ pathname: '/(tabs)/all-courses', params: { from: currentRoute } } as any)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.viewAllText}>View All →</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScroll}
+          >
+            {popularCourses.map((course) => (
+              <TouchableOpacity 
+                key={course.id}
+                style={[styles.courseCard, { backgroundColor: colors.cardBackground }]}
+                activeOpacity={0.8}
+                onPress={() => router.push({ pathname: '/(tabs)/all-courses', params: { from: currentRoute } } as any)}
+              >
+                <View style={styles.courseBadge}>
+                  <Text style={styles.courseBadgeText}>{course.level}</Text>
+                </View>
+                <Text style={[styles.courseTitle, { color: colors.text }]}>{course.title}</Text>
+                <Text style={styles.courseProvider}>by {course.provider}</Text>
+                <View style={styles.courseDuration}>
+                  <Text style={styles.courseDurationIcon}>⏱️</Text>
+                  <Text style={[styles.courseDurationText, { color: colors.textSecondary }]}>{course.duration}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </ScrollView>
 
       {menuOpen && (
-        <View style={styles.dropdownMenu}>
+        <View style={[styles.dropdownMenu, { backgroundColor: colors.cardBackground }]}>
           <TouchableOpacity 
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
             onPress={handleLogout}
             activeOpacity={0.7}
           >
             <Text style={styles.menuItemIcon}>🚪</Text>
-            <Text style={styles.menuItemText}>Logout</Text>
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Logout</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {searchQuery.trim() !== '' && (
-        <View style={styles.searchResultsDropdown}>
+        <View style={[styles.searchResultsDropdown, { backgroundColor: colors.cardBackground }]}>
           {filteredCareers.length > 0 ? (
             <>
-              <Text style={styles.searchResultsTitle}>
+              <Text style={[styles.searchResultsTitle, { color: colors.text }]}>
                 Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
               </Text>
               <ScrollView 
@@ -214,7 +306,7 @@ export default function PathFinderApp() {
                   {filteredCareers.map((career, index) => (
                   <TouchableOpacity
                     key={index}
-                    style={styles.searchResultCard}
+                    style={[styles.searchResultCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
                     activeOpacity={0.8}
                     onPress={() => {
                       Keyboard.dismiss(); // Dismiss keyboard first
@@ -224,10 +316,10 @@ export default function PathFinderApp() {
                     }}
                   >
                       <View>
-                        <Text style={styles.searchResultTitle}>{career.title}</Text>
-                        <Text style={styles.searchResultCategory}>{career.category}</Text>
+                        <Text style={[styles.searchResultTitle, { color: colors.text }]}>{career.title}</Text>
+                        <Text style={[styles.searchResultCategory, { color: colors.textSecondary }]}>{career.category}</Text>
                       </View>
-                      <View style={styles.searchResultArrow}>
+                      <View style={[styles.searchResultArrow, { backgroundColor: colors.primaryLight }]}>
                         <Text style={styles.searchResultArrowIcon}>→</Text>
                       </View>
                     </TouchableOpacity>
@@ -236,9 +328,9 @@ export default function PathFinderApp() {
               </ScrollView>
             </>
           ) : (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>No careers found for "{searchQuery}"</Text>
-              <Text style={styles.noResultsSubtext}>Try searching for a different career or category</Text>
+            <View style={[styles.noResultsContainer, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+              <Text style={[styles.noResultsText, { color: colors.text }]}>No careers found for "{searchQuery}"</Text>
+              <Text style={[styles.noResultsSubtext, { color: colors.textSecondary }]}>Try searching for a different career or category</Text>
             </View>
           )}
         </View>
@@ -247,7 +339,7 @@ export default function PathFinderApp() {
       {/* <View style={styles.mentorButtonContainer}>
         <TouchableOpacity 
           activeOpacity={0.9}
-          onPress={() => router.push('/mentors' as any)}
+          onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
         >
           <View style={styles.mentorButton}>
             <Text style={styles.mentorButtonText}>Find a Mentor</Text>
@@ -423,7 +515,7 @@ const styles = StyleSheet.create({
   },
   careerSection: {
     paddingHorizontal: 24,
-    marginBottom: 120,
+    marginBottom: 32,
   },
   careerList: {
     gap: 12,
@@ -564,5 +656,142 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
+  },
+  // Popular Mentors Section
+  mentorSection: {
+    paddingLeft: 24,
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingRight: 24,
+    marginBottom: 16,
+  },
+  viewAllText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9333EA',
+  },
+  horizontalScroll: {
+    paddingRight: 24,
+    gap: 16,
+  },
+  mentorCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    width: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  mentorAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#F3E8FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  mentorAvatarText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#9333EA',
+  },
+  mentorName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  mentorTitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  mentorCompany: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  mentorRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  mentorStar: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+  mentorRatingText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#92400E',
+  },
+  // Popular Courses Section
+  courseSection: {
+    paddingLeft: 24,
+    marginBottom: 120,
+  },
+  courseCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    width: 280,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  courseBadge: {
+    backgroundColor: '#DBEAFE',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  courseBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1E40AF',
+  },
+  courseTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  courseProvider: {
+    fontSize: 13,
+    color: '#9333EA',
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  courseDuration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  courseDurationIcon: {
+    fontSize: 14,
+    marginRight: 6,
+  },
+  courseDurationText: {
+    fontSize: 13,
+    color: '#6B7280',
   },
 });

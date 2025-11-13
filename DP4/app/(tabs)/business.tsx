@@ -1,9 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 
 export default function BusinessPage() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
+  const currentRoute = '/(tabs)/business';
+  const { colors, globalStyles } = useThemedStyles();
 
   const careers = [
     {
@@ -33,24 +38,24 @@ export default function BusinessPage() {
   ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    <View style={globalStyles.container}>
+      <ScrollView style={globalStyles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header with Back Button */}
-        <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: colors.background }]}>
           <TouchableOpacity 
-            onPress={() => router.back()} 
-            style={styles.backButton}
+            onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} 
+            style={globalStyles.backButton}
             activeOpacity={0.7}
           >
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backText}>Back</Text>
+            <Text style={globalStyles.backIcon}>←</Text>
+            <Text style={globalStyles.backText}>Back</Text>
           </TouchableOpacity>
         </View>
 
         {/* Title Section */}
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Business</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.text }]}>Business</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Explore careers in finance, management, and entrepreneurship
           </Text>
         </View>
@@ -60,48 +65,48 @@ export default function BusinessPage() {
           {careers.map((career, index) => (
             <TouchableOpacity 
               key={index} 
-              style={styles.careerCard}
+              style={[styles.careerCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
               activeOpacity={0.8}
               onPress={() => {
                 if (career.title === 'Financial Manager') {
-                  router.push('/financial-manager' as any);
+                  router.push({ pathname: '/(tabs)/financial-manager', params: { from: currentRoute } } as any);
                 } else if (career.title === 'Investment Banker') {
-                  router.push('/investment-banker' as any);
+                  router.push({ pathname: '/(tabs)/investment-banker', params: { from: currentRoute } } as any);
                 } else if (career.title === 'Sales Manager') {
-                  router.push('/sales-manager' as any);
+                  router.push({ pathname: '/(tabs)/sales-manager', params: { from: currentRoute } } as any);
                 } else if (career.title === 'Marketing Manager') {
-                  router.push('/marketing-manager' as any);
+                  router.push({ pathname: '/(tabs)/marketing-manager', params: { from: currentRoute } } as any);
                 }
               }}
             >
               <View style={styles.careerInfo}>
-                <Text style={styles.careerTitle}>{career.title}</Text>
+                <Text style={[styles.careerTitle, { color: colors.text }]}>{career.title}</Text>
                 <View style={styles.careerDetails}>
-                  <Text style={styles.salaryText}>{career.salary}</Text>
-                  <Text style={styles.dot}>•</Text>
+                  <Text style={[styles.salaryText, { color: colors.textSecondary }]}>{career.salary}</Text>
+                  <Text style={[styles.dot, { color: colors.textTertiary }]}>•</Text>
                   <View style={[styles.growthIndicator, { backgroundColor: career.growthColor }]} />
-                  <Text style={styles.growthText}>{career.growth}</Text>
+                  <Text style={[styles.growthText, { color: colors.textSecondary }]}>{career.growth}</Text>
                 </View>
               </View>
-              <View style={styles.arrowContainer}>
-                <Text style={styles.arrowIcon}>→</Text>
+              <View style={[styles.arrowContainer, { backgroundColor: colors.primaryLight }]}>
+                <Text style={[styles.arrowIcon, { color: colors.primary }]}>→</Text>
               </View>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Guidance Section */}
-        <View style={styles.guidanceContainer}>
-          <Text style={styles.guidanceTitle}>Need guidance?</Text>
-          <Text style={styles.guidanceSubtitle}>
+        <View style={[styles.guidanceContainer, { backgroundColor: colors.primaryLight }]}>
+          <Text style={[styles.guidanceTitle, { color: colors.primaryDark }]}>Need guidance?</Text>
+          <Text style={[styles.guidanceSubtitle, { color: colors.primaryDark }]}>
             Take our career quiz or connect with a mentor to find the perfect path for you.
           </Text>
           
           <View style={styles.buttonColumn}>
             <TouchableOpacity 
-              style={styles.mentorButton} 
+              style={[styles.mentorButton, { backgroundColor: colors.primary }]}
               activeOpacity={0.8}
-              onPress={() => router.push('/mentors' as any)}
+              onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
             >
               <Text style={styles.mentorButtonText}>Find Mentor</Text>
             </TouchableOpacity>
@@ -114,8 +119,8 @@ export default function BusinessPage() {
               <Text style={styles.coursesButtonText}>Browse Courses</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.quizButton} activeOpacity={0.8} onPress={() => router.push('/quiz' as any)}>
-              <Text style={styles.quizButtonText}>Take Career Quiz</Text>
+            <TouchableOpacity style={[styles.quizButton, { backgroundColor: colors.cardBackground, borderColor: colors.primary }]} activeOpacity={0.8} onPress={() => router.push({ pathname: '/(tabs)/quiz', params: { from: currentRoute } } as any)}>
+              <Text style={[styles.quizButtonText, { color: colors.primary }]}>Take Career Quiz</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -125,30 +130,10 @@ export default function BusinessPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollView: {
-    flex: 1,
-  },
   header: {
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 16,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backIcon: {
-    fontSize: 20,
-    color: '#1F2937',
-    marginRight: 4,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#1F2937',
   },
   titleContainer: {
     paddingHorizontal: 24,
@@ -157,12 +142,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
     lineHeight: 22,
   },
   careerContainer: {
@@ -170,7 +153,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   careerCard: {
-    backgroundColor: '#F3F4F6',
     borderRadius: 12,
     padding: 20,
     marginBottom: 12,
@@ -179,7 +161,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 2,
     borderStyle: 'dotted',
-    borderColor: '#60A5FA',
   },
   careerInfo: {
     flex: 1,
@@ -187,7 +168,6 @@ const styles = StyleSheet.create({
   careerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 8,
   },
   careerDetails: {
@@ -196,12 +176,10 @@ const styles = StyleSheet.create({
   },
   salaryText: {
     fontSize: 14,
-    color: '#4B5563',
     marginRight: 8,
   },
   dot: {
     fontSize: 14,
-    color: '#9CA3AF',
     marginRight: 8,
   },
   growthIndicator: {
@@ -212,10 +190,8 @@ const styles = StyleSheet.create({
   },
   growthText: {
     fontSize: 14,
-    color: '#4B5563',
   },
   arrowContainer: {
-    backgroundColor: '#E0E7FF',
     borderRadius: 20,
     width: 40,
     height: 40,
@@ -224,10 +200,8 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     fontSize: 20,
-    color: '#9333EA',
   },
   guidanceContainer: {
-    backgroundColor: '#FCE7F3',
     marginHorizontal: 24,
     marginBottom: 40,
     padding: 24,
@@ -236,12 +210,10 @@ const styles = StyleSheet.create({
   guidanceTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#7E22CE',
     marginBottom: 8,
   },
   guidanceSubtitle: {
     fontSize: 14,
-    color: '#7E22CE',
     lineHeight: 20,
     marginBottom: 20,
   },
@@ -249,7 +221,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   mentorButton: {
-    backgroundColor: '#9333EA',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -271,15 +242,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   quizButton: {
-    backgroundColor: '#FFFFFF',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#9333EA',
   },
   quizButtonText: {
-    color: '#9333EA',
     fontWeight: '600',
     fontSize: 16,
   },

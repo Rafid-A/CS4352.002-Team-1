@@ -7,10 +7,18 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username.trim() === '' || password.trim() === '') {
       Alert.alert('Oops!', 'Please enter both username and password');
       return;
+    }
+
+    // Store username for profile page
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.setItem('username', username.trim());
+    } catch (error) {
+      console.log('Error storing username:', error);
     }
 
     router.replace('/(tabs)' as any);

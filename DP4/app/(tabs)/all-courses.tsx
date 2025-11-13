@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { savedCoursesStorage } from '../../utils/storage';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Course {
   id: number;
@@ -44,8 +46,41 @@ const allCoursesData: Course[] = [
 
 export default function AllCoursesScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [savedCourseIds, setSavedCourseIds] = useState<Set<number>>(new Set());
+  const { colors } = useTheme();
+
+  // Load saved courses when page is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadSavedCourses = async () => {
+        const saved = await savedCoursesStorage.get();
+        const ids = new Set(saved.map(c => c.id));
+        setSavedCourseIds(ids);
+      };
+      loadSavedCourses();
+    }, [])
+  );
+
+  // Toggle save status for a course
+  const toggleSave = async (course: Course) => {
+    const isSaved = savedCourseIds.has(course.id);
+    
+    if (isSaved) {
+      await savedCoursesStorage.remove(course.id);
+      setSavedCourseIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(course.id);
+        return newSet;
+      });
+    } else {
+      await savedCoursesStorage.add(course);
+      setSavedCourseIds(prev => new Set(prev).add(course.id));
+    }
+  };
 
   const categories = ['All', 'Technology', 'Business', 'Arts', 'Sciences', 'Design', 'Marketing', 'Finance'];
 
@@ -81,17 +116,17 @@ export default function AllCoursesScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>All Courses</Text>
-        <Text style={styles.subtitle}>Explore {allCoursesData.length}+ courses across all career paths</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>All Courses</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Explore {allCoursesData.length}+ courses across all career paths</Text>
 
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Search courses, providers, or skills..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -101,7 +136,7 @@ export default function AllCoursesScreen() {
               style={styles.clearButton}
               activeOpacity={0.7}
             >
-              <Text style={styles.clearIcon}>✕</Text>
+              <Text style={[styles.clearIcon, { color: colors.textTertiary }]}>✕</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -117,6 +152,7 @@ export default function AllCoursesScreen() {
               key={category}
               style={[
                 styles.filterChip,
+                { backgroundColor: selectedCategory === category ? colors.primary : colors.primaryLight },
                 selectedCategory === category && styles.filterChipActive
               ]}
               onPress={() => setSelectedCategory(category)}
@@ -124,6 +160,7 @@ export default function AllCoursesScreen() {
             >
               <Text style={[
                 styles.filterChipText,
+                { color: selectedCategory === category ? colors.text : colors.primary },
                 selectedCategory === category && styles.filterChipTextActive
               ]}>
                 {category}
@@ -140,55 +177,66 @@ export default function AllCoursesScreen() {
       >
         {filteredCourses.length === 0 ? (
           <View style={styles.noResults}>
-            <Text style={styles.noResultsText}>No courses found</Text>
-            <Text style={styles.noResultsSubtext}>Try adjusting your search or filters</Text>
+            <Text style={[styles.noResultsText, { color: colors.text }]}>No courses found</Text>
+            <Text style={[styles.noResultsSubtext, { color: colors.textSecondary }]}>Try adjusting your search or filters</Text>
           </View>
         ) : (
           filteredCourses.map((course) => (
-            <View key={course.id} style={styles.courseCard}>
-              <View style={styles.courseHeader}>
-                <View style={styles.courseTitleRow}>
-                  <Text style={styles.courseTitle}>{course.title}</Text>
-                  <View style={[styles.typeBadge, { backgroundColor: getTypeColor(course.type) }]}>
-                    <Text style={styles.typeBadgeText}>{course.type}</Text>
+            <View key={course.id} style={[styles.courseCard, { backgroundColor: colors.cardBackground }]}>
+              <View style={styles.courseHeaderWithSave}>
+                <View style={styles.courseHeader}>
+                  <View style={styles.courseTitleRow}>
+                    <Text style={[styles.courseTitle, { color: colors.text }]}>{course.title}</Text>
+                    <View style={[styles.typeBadge, { backgroundColor: getTypeColor(course.type) }]}>
+                      <Text style={styles.typeBadgeText}>{course.type}</Text>
+                    </View>
                   </View>
+                  <Text style={[styles.provider, { color: colors.primary }]}>by {course.provider}</Text>
+                  <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>{course.category}</Text>
                 </View>
-                <Text style={styles.provider}>by {course.provider}</Text>
-                <Text style={styles.categoryLabel}>{course.category}</Text>
+                <TouchableOpacity 
+                  style={styles.saveButton}
+                  onPress={() => toggleSave(course)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.saveIcon}>
+                    {savedCourseIds.has(course.id) ? '❤️' : '🤍'}
+                  </Text>
+                </TouchableOpacity>
               </View>
 
-              <Text style={styles.description}>{course.description}</Text>
+              <Text style={[styles.description, { color: colors.textSecondary }]}>{course.description}</Text>
 
               <View style={styles.courseDetails}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailIcon}>⏱️</Text>
-                  <Text style={styles.detailText}>{course.duration}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.duration}</Text>
                 </View>
                 <View style={styles.detailRow}>
                   <View style={[styles.levelDot, { backgroundColor: getLevelColor(course.level) }]} />
-                  <Text style={styles.detailText}>{course.level}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.level}</Text>
                 </View>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailIcon}>💰</Text>
-                  <Text style={styles.detailText}>{course.cost}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.cost}</Text>
                 </View>
               </View>
 
               <View style={styles.skills}>
                 {course.skills.slice(0, 3).map((skill, index) => (
-                  <View key={index} style={styles.skillBadge}>
-                    <Text style={styles.skillText}>{skill}</Text>
+                  <View key={index} style={[styles.skillBadge, { backgroundColor: colors.primaryLight }]}>
+                    <Text style={[styles.skillText, { color: colors.primary }]}>{skill}</Text>
                   </View>
                 ))}
                 {course.skills.length > 3 && (
-                  <View style={styles.skillBadge}>
-                    <Text style={styles.skillText}>+{course.skills.length - 3}</Text>
+                  <View style={[styles.skillBadge, { backgroundColor: colors.primaryLight }]}>
+                    <Text style={[styles.skillText, { color: colors.primary }]}>+{course.skills.length - 3}</Text>
                   </View>
                 )}
               </View>
 
               <TouchableOpacity 
-                style={styles.enrollButton}
+                style={[styles.enrollButton, { backgroundColor: colors.primary }]}
                 activeOpacity={0.8}
               >
                 <Text style={styles.enrollText}>Learn More</Text>
@@ -205,36 +253,29 @@ export default function AllCoursesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#F3E8FF',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
     marginBottom: 16,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FDF2F8',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#F3E8FF',
     marginBottom: 16,
   },
   searchIcon: {
@@ -244,14 +285,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#1F2937',
   },
   clearButton: {
     padding: 4,
   },
   clearIcon: {
     fontSize: 18,
-    color: '#9CA3AF',
   },
   filterScroll: {
     marginHorizontal: -24,
@@ -265,18 +304,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3E8FF',
   },
   filterChipActive: {
-    backgroundColor: '#9333EA',
+    // Applied inline
   },
   filterChipText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#9333EA',
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    // Applied inline
   },
   scrollView: {
     flex: 1,
@@ -286,7 +323,6 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   courseCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -296,8 +332,21 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  courseHeader: {
+  courseHeaderWithSave: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  courseHeader: {
+    flex: 1,
+    marginRight: 8,
+  },
+  saveButton: {
+    padding: 8,
+  },
+  saveIcon: {
+    fontSize: 24,
   },
   courseTitleRow: {
     flexDirection: 'row',
@@ -308,7 +357,6 @@ const styles = StyleSheet.create({
   courseTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
     flex: 1,
     marginRight: 8,
   },
@@ -324,18 +372,15 @@ const styles = StyleSheet.create({
   },
   provider: {
     fontSize: 14,
-    color: '#9333EA',
     fontWeight: '500',
     marginBottom: 4,
   },
   categoryLabel: {
     fontSize: 13,
-    color: '#6B7280',
     fontStyle: 'italic',
   },
   description: {
     fontSize: 14,
-    color: '#4B5563',
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -355,7 +400,6 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 13,
-    color: '#6B7280',
   },
   levelDot: {
     width: 8,
@@ -370,18 +414,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   skillBadge: {
-    backgroundColor: '#F3E8FF',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
   },
   skillText: {
     fontSize: 12,
-    color: '#9333EA',
     fontWeight: '500',
   },
   enrollButton: {
-    backgroundColor: '#9333EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -406,12 +447,10 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#6B7280',
     marginBottom: 8,
   },
   noResultsSubtext: {
     fontSize: 14,
-    color: '#9CA3AF',
   },
 });
 
