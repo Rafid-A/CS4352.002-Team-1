@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTheme } from '../../context/ThemeContext';
 
 const quizQuestions = [
   {
@@ -127,6 +128,7 @@ export default function QuizPage() {
   const params = useLocalSearchParams();
   const fromRoute = params.from as string;
   const currentRoute = '/(tabs)/quiz';
+  const { colors } = useTheme();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -197,40 +199,40 @@ export default function QuizPage() {
     const resultMessage = getResultMessage();
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={styles.backButton}>
-              <Text style={styles.backIcon}>←</Text>
-              <Text style={styles.backText}>Back</Text>
+            <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={[styles.backButton, { backgroundColor: colors.primaryLight }]}>
+              <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+              <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.resultsContainer}>
-            <Text style={styles.resultsTitle}>Your Results!</Text>
-            <View style={styles.resultCard}>
-              <Text style={styles.resultCategory}>{resultMessage.category}</Text>
-              <Text style={styles.resultDescription}>{resultMessage.description}</Text>
+            <Text style={[styles.resultsTitle, { color: colors.primary }]}>Your Results!</Text>
+            <View style={[styles.resultCard, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}>
+              <Text style={[styles.resultCategory, { color: colors.primary }]}>{resultMessage.category}</Text>
+              <Text style={[styles.resultDescription, { color: colors.textSecondary }]}>{resultMessage.description}</Text>
             </View>
 
-            <Text style={styles.recommendationsTitle}>Recommended Careers for You:</Text>
+            <Text style={[styles.recommendationsTitle, { color: colors.text }]}>Recommended Careers for You:</Text>
             <View style={styles.careersList}>
               {recommendations.map((career, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={styles.careerCard}
+                  style={[styles.careerCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
                   onPress={() => router.push({ pathname: career.route, params: { from: currentRoute } } as any)}
                 >
-                  <Text style={styles.careerTitle}>{career.title}</Text>
-                  <View style={styles.careerArrow}>
-                    <Text style={styles.arrowIcon}>→</Text>
+                  <Text style={[styles.careerTitle, { color: colors.text }]}>{career.title}</Text>
+                  <View style={[styles.careerArrow, { backgroundColor: colors.primaryLight }]}>
+                    <Text style={[styles.arrowIcon, { color: colors.primary }]}>→</Text>
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
 
             <TouchableOpacity
-              style={styles.retakeButton}
+              style={[styles.retakeButton, { backgroundColor: colors.cardBackground, borderColor: colors.primary }]}
               onPress={() => {
                 setCurrentQuestion(0);
                 setAnswers([]);
@@ -238,11 +240,11 @@ export default function QuizPage() {
                 setShowResults(false);
               }}
             >
-              <Text style={styles.retakeButtonText}>Retake Quiz</Text>
+              <Text style={[styles.retakeButtonText, { color: colors.primary }]}>Retake Quiz</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.homeButton}
+              style={[styles.homeButton, { backgroundColor: colors.primary }]}
               onPress={() => router.push('/')}
             >
               <Text style={styles.homeButtonText}>Back to Home</Text>
@@ -254,27 +256,27 @@ export default function QuizPage() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={styles.backButton}>
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backText}>Back</Text>
+          <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={[styles.backButton, { backgroundColor: colors.primaryLight }]}>
+            <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+            <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.progressContainer}>
-          <Text style={styles.questionCounter}>
+          <Text style={[styles.questionCounter, { color: colors.textSecondary }]}>
             Question {currentQuestion + 1} of {quizQuestions.length}
           </Text>
-          <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
+          <Text style={[styles.progressPercent, { color: colors.primary }]}>{Math.round(progress)}%</Text>
         </View>
 
-        <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${progress}%` }]} />
+        <View style={[styles.progressBarContainer, { backgroundColor: colors.inputBackground }]}>
+          <View style={[styles.progressBar, { width: `${progress}%`, backgroundColor: colors.primary }]} />
         </View>
 
-        <Text style={styles.questionText}>{quizQuestions[currentQuestion].question}</Text>
+        <Text style={[styles.questionText, { color: colors.text }]}>{quizQuestions[currentQuestion].question}</Text>
 
         <View style={styles.optionsContainer}>
           {quizQuestions[currentQuestion].options.map((option, index) => (
@@ -282,23 +284,24 @@ export default function QuizPage() {
               key={index}
               style={[
                 styles.optionCard,
-                selectedOption === index && styles.optionCardSelected
+                { backgroundColor: colors.cardBackground, borderColor: selectedOption === index ? colors.primary : colors.border },
+                selectedOption === index && { backgroundColor: colors.primaryLight }
               ]}
               onPress={() => handleSelectOption(index)}
             >
-              <Text style={styles.optionText}>{option}</Text>
+              <Text style={[styles.optionText, { color: colors.text }]}>{option}</Text>
               <View style={[
                 styles.radioButton,
-                selectedOption === index && styles.radioButtonSelected
+                { borderColor: selectedOption === index ? colors.primary : colors.border }
               ]}>
-                {selectedOption === index && <View style={styles.radioButtonInner} />}
+                {selectedOption === index && <View style={[styles.radioButtonInner, { backgroundColor: colors.primary }]} />}
               </View>
             </TouchableOpacity>
           ))}
         </View>
 
         <TouchableOpacity
-          style={[styles.nextButton, selectedOption === null && styles.nextButtonDisabled]}
+          style={[styles.nextButton, { backgroundColor: selectedOption === null ? colors.inputBackground : colors.primary }]}
           onPress={handleNext}
           disabled={selectedOption === null}
         >
@@ -314,7 +317,6 @@ export default function QuizPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
@@ -327,15 +329,18 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   backIcon: {
     fontSize: 24,
-    color: '#1F2937',
     marginRight: 8,
   },
   backText: {
     fontSize: 18,
-    color: '#1F2937',
+    fontWeight: '500',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -346,29 +351,24 @@ const styles = StyleSheet.create({
   },
   questionCounter: {
     fontSize: 16,
-    color: '#6B7280',
   },
   progressPercent: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#D946EF',
   },
   progressBarContainer: {
     height: 8,
-    backgroundColor: '#E5E7EB',
     marginHorizontal: 24,
     borderRadius: 4,
     marginBottom: 32,
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#D946EF',
     borderRadius: 4,
   },
   questionText: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
     paddingHorizontal: 24,
     marginBottom: 24,
     lineHeight: 28,
@@ -378,22 +378,15 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   optionCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  optionCardSelected: {
-    borderColor: '#D946EF',
-    backgroundColor: '#FDF2F8',
-  },
   optionText: {
     fontSize: 16,
-    color: '#1F2937',
     flex: 1,
     marginRight: 12,
   },
@@ -402,30 +395,21 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  radioButtonSelected: {
-    borderColor: '#D946EF',
   },
   radioButtonInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#D946EF',
   },
   nextButton: {
-    backgroundColor: '#9333EA',
     marginHorizontal: 24,
     marginTop: 32,
     marginBottom: 40,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
-  },
-  nextButtonDisabled: {
-    backgroundColor: '#D1D5DB',
   },
   nextButtonText: {
     color: '#FFFFFF',
@@ -440,33 +424,27 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#9333EA',
     marginBottom: 24,
     textAlign: 'center',
   },
   resultCard: {
-    backgroundColor: '#FDF2F8',
     borderRadius: 16,
     padding: 24,
     marginBottom: 32,
     borderWidth: 2,
-    borderColor: '#F9A8D4',
   },
   resultCategory: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#9333EA',
     marginBottom: 12,
   },
   resultDescription: {
     fontSize: 16,
-    color: '#6B7280',
     lineHeight: 24,
   },
   recommendationsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 16,
   },
   careersList: {
@@ -474,14 +452,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   careerCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -491,10 +467,8 @@ const styles = StyleSheet.create({
   careerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
   },
   careerArrow: {
-    backgroundColor: '#FCE7F3',
     borderRadius: 20,
     width: 40,
     height: 40,
@@ -503,24 +477,19 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     fontSize: 20,
-    color: '#9333EA',
   },
   retakeButton: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 2,
-    borderColor: '#9333EA',
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
     marginBottom: 12,
   },
   retakeButtonText: {
-    color: '#9333EA',
     fontSize: 16,
     fontWeight: '600',
   },
   homeButton: {
-    backgroundColor: '#9333EA',
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',

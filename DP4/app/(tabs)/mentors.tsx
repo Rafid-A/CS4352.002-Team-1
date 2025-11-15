@@ -285,8 +285,8 @@ export default function MentorsScreen() {
           onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backText}>Back</Text>
+          <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
         </TouchableOpacity>
         
         <Text style={[styles.title, { color: colors.text }]}>Find Your Mentor</Text>
@@ -400,16 +400,18 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
     marginBottom: 16,
   },
   backIcon: {
-    fontSize: 24,
-    color: '#9333EA',
-    marginRight: 8,
+    fontSize: 20,
+    marginRight: 4,
   },
   backText: {
     fontSize: 16,
-    color: '#9333EA',
     fontWeight: '500',
   },
   title: {

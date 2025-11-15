@@ -3,11 +3,13 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal 
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { savedCourses as coursesData } from '../../data/savedData';
 import { savedCoursesStorage } from '../../utils/storage';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function SavedCoursesScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const fromRoute = params.from as string;
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [savedCourses, setSavedCourses] = useState<any[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -75,7 +77,7 @@ export default function SavedCoursesScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -84,24 +86,24 @@ export default function SavedCoursesScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.backButton}
+            style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
             onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
             activeOpacity={0.7}
           >
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backText}>Back</Text>
+            <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+            <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
           </TouchableOpacity>
           
-          <Text style={styles.title}>Saved Courses</Text>
-          <Text style={styles.subtitle}>Continue your learning journey</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Saved Courses</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Continue your learning journey</Text>
 
           {/* Search Bar */}
-          <View style={styles.searchContainer}>
+          <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground }]}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: colors.text }]}
               placeholder="Search courses..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
               autoCapitalize="none"
@@ -113,13 +115,13 @@ export default function SavedCoursesScreen() {
                 style={styles.clearButton}
                 activeOpacity={0.7}
               >
-                <Text style={styles.clearIcon}>✕</Text>
+                <Text style={[styles.clearIcon, { color: colors.textTertiary }]}>✕</Text>
               </TouchableOpacity>
             )}
           </View>
 
           {/* Results count */}
-          <Text style={styles.resultsCount}>
+          <Text style={[styles.resultsCount, { color: colors.textSecondary }]}>
             {filteredCourses.length} {filteredCourses.length === 1 ? 'course' : 'courses'}
           </Text>
         </View>
@@ -127,25 +129,25 @@ export default function SavedCoursesScreen() {
         {/* Courses List */}
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
-            <View key={course.id} style={styles.courseCard}>
+            <View key={course.id} style={[styles.courseCard, { backgroundColor: colors.cardBackground }]}>
               <View style={styles.courseHeader}>
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryText}>{course.category}</Text>
+                <View style={[styles.categoryBadge, { backgroundColor: colors.primaryLight }]}>
+                  <Text style={[styles.categoryText, { color: colors.primary }]}>{course.category}</Text>
                 </View>
-                <View style={styles.levelBadge}>
-                  <Text style={styles.levelText}>{course.level}</Text>
+                <View style={[styles.levelBadge, { backgroundColor: colors.primaryLight }]}>
+                  <Text style={[styles.levelText, { color: colors.primary }]}>{course.level}</Text>
                 </View>
               </View>
 
-              <Text style={styles.courseTitle}>{course.title}</Text>
-              <Text style={styles.courseProvider}>{course.provider} • {course.duration}</Text>
+              <Text style={[styles.courseTitle, { color: colors.text }]}>{course.title}</Text>
+              <Text style={[styles.courseProvider, { color: colors.textSecondary }]}>{course.provider} • {course.duration}</Text>
               
-              <Text style={styles.courseDescription}>{course.description}</Text>
+              <Text style={[styles.courseDescription, { color: colors.textSecondary }]}>{course.description}</Text>
 
               {/* Action Buttons */}
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
-                  style={styles.externalButton}
+                  style={[styles.externalButton, { backgroundColor: colors.primary }]}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.externalIcon}>🔗</Text>
@@ -153,7 +155,7 @@ export default function SavedCoursesScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={styles.removeButton}
+                  style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
                   activeOpacity={0.8}
                   onPress={() => {
                     console.log('Course remove button pressed directly');
@@ -170,10 +172,10 @@ export default function SavedCoursesScreen() {
             <Text style={styles.noResultsIcon}>
               {searchQuery.length > 0 ? '🔍' : '📚'}
             </Text>
-            <Text style={styles.noResultsTitle}>
+            <Text style={[styles.noResultsTitle, { color: colors.text }]}>
               {searchQuery.length > 0 ? 'No courses found' : 'No saved courses yet'}
             </Text>
-            <Text style={styles.noResultsText}>
+            <Text style={[styles.noResultsText, { color: colors.textSecondary }]}>
               {searchQuery.length > 0 
                 ? 'Try adjusting your search terms' 
                 : 'Courses you save will appear here'}
@@ -190,18 +192,18 @@ export default function SavedCoursesScreen() {
         onRequestClose={cancelRemoveCourse}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Remove Course</Text>
-            <Text style={styles.modalMessage}>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Remove Course</Text>
+            <Text style={[styles.modalMessage, { color: colors.textSecondary }]}>
               Remove "{courseToRemove?.title}" from your saved courses?
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, { backgroundColor: colors.inputBackground }]}
                 onPress={cancelRemoveCourse}
                 activeOpacity={0.8}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.removeButtonModal]}
@@ -221,7 +223,6 @@ export default function SavedCoursesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   scrollView: {
     flex: 1,
@@ -238,32 +239,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   backIcon: {
     fontSize: 24,
-    color: '#9333EA',
     marginRight: 8,
   },
   backText: {
     fontSize: 16,
-    color: '#9333EA',
     fontWeight: '500',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
     marginBottom: 16,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -281,7 +281,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#1F2937',
     padding: 0,
   },
   clearButton: {
@@ -290,17 +289,14 @@ const styles = StyleSheet.create({
   },
   clearIcon: {
     fontSize: 18,
-    color: '#9CA3AF',
     fontWeight: '600',
   },
   resultsCount: {
     fontSize: 14,
-    color: '#6B7280',
     marginTop: 12,
     fontWeight: '500',
   },
   courseCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginHorizontal: 24,
@@ -317,41 +313,34 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryBadge: {
-    backgroundColor: '#F3E8FF',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   categoryText: {
     fontSize: 12,
-    color: '#9333EA',
     fontWeight: '600',
   },
   levelBadge: {
-    backgroundColor: '#E0E7FF',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   levelText: {
     fontSize: 12,
-    color: '#6366F1',
     fontWeight: '600',
   },
   courseTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 6,
   },
   courseProvider: {
     fontSize: 14,
-    color: '#6B7280',
     marginBottom: 12,
   },
   courseDescription: {
     fontSize: 14,
-    color: '#4B5563',
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -361,7 +350,6 @@ const styles = StyleSheet.create({
   },
   externalButton: {
     flex: 1,
-    backgroundColor: '#9333EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -379,13 +367,11 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     width: 48,
-    backgroundColor: '#FEF2F2',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
   },
   removeIcon: {
     fontSize: 18,
@@ -405,13 +391,11 @@ const styles = StyleSheet.create({
   noResultsTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 8,
     textAlign: 'center',
   },
   noResultsText: {
     fontSize: 15,
-    color: '#6B7280',
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -423,7 +407,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -437,13 +420,11 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 12,
     textAlign: 'center',
   },
   modalMessage: {
     fontSize: 15,
-    color: '#6B7280',
     marginBottom: 24,
     textAlign: 'center',
     lineHeight: 22,
@@ -461,15 +442,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 44,
   },
-  cancelButton: {
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
   cancelButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
   },
   removeButtonModal: {
     backgroundColor: '#DC2626',

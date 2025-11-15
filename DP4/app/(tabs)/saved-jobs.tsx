@@ -74,8 +74,8 @@ export default function SavedJobsPage() {
                 style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
                 activeOpacity={0.7}
               >
-                <Text style={styles.backIcon}>←</Text>
-                <Text style={styles.backText}>Back</Text>
+                <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+                <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
               </TouchableOpacity>
             </View>
     
@@ -113,11 +113,11 @@ export default function SavedJobsPage() {
                         </View>
                       </View>
                       <View style={[styles.arrowContainer, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={styles.arrowIcon}>→</Text>
+                        <Text style={[styles.arrowIcon, { color: colors.primary }]}>→</Text>
                       </View>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={styles.removeButton}
+                      style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderTopColor: colors.border }]}
                       onPress={() => {
                         console.log('Remove button pressed directly');
                         handleRemoveJob(career.id, career.title);
@@ -125,6 +125,7 @@ export default function SavedJobsPage() {
                       activeOpacity={0.7}
                     >
                       <Text style={styles.removeIcon}>🗑️</Text>
+                      <Text style={[styles.removeText, { color: colors.text }]}>Remove</Text>
                     </TouchableOpacity>
                   </View>
                 ))
@@ -193,15 +194,19 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
   },
   backIcon: {
     fontSize: 20,
-    color: '#1F2937',
     marginRight: 4,
   },
   backText: {
     fontSize: 16,
-    color: '#1F2937',
+    fontWeight: '500',
   },
   titleContainer: {
     paddingHorizontal: 24,
@@ -280,21 +285,24 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     fontSize: 20,
-    color: '#9333EA',
   },
   removeButton: {
-    backgroundColor: '#FEE2E2',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderTopWidth: 1,
-    borderTopColor: '#FCA5A5',
     width: '100%',
     minHeight: 44, // Ensure minimum touch target
+    gap: 8,
   },
   removeIcon: {
     fontSize: 18,
+  },
+  removeText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   emptyContainer: {
     alignItems: 'center',

@@ -12,8 +12,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY, mentorPrompts } from '../config/gemini';
+import { useTheme } from '../context/ThemeContext';
 
 interface Message {
   id: number;
@@ -53,6 +53,7 @@ const initialMessages: { [key: string]: Message[] } = {};
 export default function ChatScreen() {
   const router = useRouter();
   const { mentorId } = useLocalSearchParams();
+  const { colors } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
 
   const mentor = mentorsData[mentorId as string];
@@ -90,9 +91,6 @@ export default function ChatScreen() {
     setIsLoading(true);
 
     try {
-      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
       const mentorContext = mentorPrompts[mentorId as string];
       
       const conversationHistory = updatedMessages
@@ -101,9 +99,37 @@ export default function ChatScreen() {
 
       const prompt = `${mentorContext}\n\nConversation so far:\n${conversationHistory}\n\nRespond to the user's latest message as the mentor. Keep your response helpful, professional, and under 200 words.`;
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      // Use REST API instead of SDK to avoid CORS issues
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: prompt }]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500,
+            }
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`HTTP Status: ${response.status} - ${errorData.error?.message || 'API request failed'}`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                   "I apologize, but I'm having trouble responding right now. Please try again in a moment.";
 
       const mentorResponse: Message = {
         id: updatedMessages.length + 1,
@@ -115,11 +141,27 @@ export default function ChatScreen() {
       const finalMessages = [...updatedMessages, mentorResponse];
       setMessages(finalMessages);
       initialMessages[mentorId as string] = finalMessages;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calling Gemini:', error);
+      
+      let errorMessage = "I apologize, but I'm having trouble connecting right now. ";
+      
+      if (Platform.OS === 'web') {
+        // CORS error - provide helpful message
+        if (error.message?.includes('CORS') || error.message?.includes('Failed to fetch')) {
+          errorMessage += "Direct API calls from web browsers are blocked by CORS. Please run this app on Android or iOS for the full experience.";
+        } else {
+          errorMessage += `Error: ${error.message || 'Please try again in a moment.'}`;
+        }
+      } else if (!GEMINI_API_KEY || GEMINI_API_KEY.length < 20) {
+        errorMessage += "API key is not configured. Please check your config/gemini.ts file.";
+      } else {
+        errorMessage += `Error: ${error.message || 'Please try again in a moment.'}`;
+      }
+      
       const errorResponse: Message = {
         id: updatedMessages.length + 1,
-        text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        text: errorMessage,
         sender: 'mentor',
         timestamp: new Date(),
       };
@@ -133,34 +175,35 @@ export default function ChatScreen() {
 
   if (!mentor) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Mentor not found</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.errorText, { color: colors.text }]}>Mentor not found</Text>
       </View>
     );
   }
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
         </TouchableOpacity>
 
         <View style={styles.mentorHeaderInfo}>
-          <View style={styles.smallAvatar}>
+          <View style={[styles.smallAvatar, { backgroundColor: colors.primary }]}>
             <Text style={styles.smallAvatarText}>{mentor.initials}</Text>
           </View>
           <View style={styles.mentorTextInfo}>
-            <Text style={styles.headerName}>{mentor.name}</Text>
-            <Text style={styles.headerTitle}>{mentor.title}</Text>
+            <Text style={[styles.headerName, { color: colors.text }]}>{mentor.name}</Text>
+            <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>{mentor.title}</Text>
           </View>
         </View>
       </View>
@@ -181,20 +224,22 @@ export default function ChatScreen() {
             ]}
           >
             {message.sender === 'mentor' && (
-              <View style={styles.tinyAvatar}>
+              <View style={[styles.tinyAvatar, { backgroundColor: colors.primary }]}>
                 <Text style={styles.tinyAvatarText}>{mentor.initials}</Text>
               </View>
             )}
             <View
               style={[
                 styles.messageContent,
-                message.sender === 'user' ? styles.userMessageContent : styles.mentorMessageContent,
+                message.sender === 'user' 
+                  ? [styles.userMessageContent, { backgroundColor: colors.primary }]
+                  : [styles.mentorMessageContent, { backgroundColor: colors.cardBackground }],
               ]}
             >
               <Text
                 style={[
                   styles.messageText,
-                  message.sender === 'user' ? styles.userMessageText : styles.mentorMessageText,
+                  message.sender === 'user' ? styles.userMessageText : [styles.mentorMessageText, { color: colors.text }],
                 ]}
               >
                 {message.text}
@@ -202,7 +247,9 @@ export default function ChatScreen() {
               <Text
                 style={[
                   styles.timestamp,
-                  message.sender === 'user' ? styles.userTimestamp : styles.mentorTimestamp,
+                  message.sender === 'user' 
+                    ? [styles.userTimestamp, { color: colors.primaryLight }]
+                    : [styles.mentorTimestamp, { color: colors.textTertiary }],
                 ]}
               >
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -213,29 +260,29 @@ export default function ChatScreen() {
         
         {isLoading && (
           <View style={[styles.messageBubble, styles.mentorMessage]}>
-            <View style={styles.tinyAvatar}>
+            <View style={[styles.tinyAvatar, { backgroundColor: colors.primary }]}>
               <Text style={styles.tinyAvatarText}>{mentor.initials}</Text>
             </View>
-            <View style={[styles.messageContent, styles.mentorMessageContent, styles.loadingContent]}>
-              <ActivityIndicator size="small" color="#9333EA" />
-              <Text style={styles.loadingText}>Typing...</Text>
+            <View style={[styles.messageContent, styles.mentorMessageContent, styles.loadingContent, { backgroundColor: colors.cardBackground }]}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={[styles.loadingText, { color: colors.primary }]}>Typing...</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { backgroundColor: colors.cardBackground, borderTopColor: colors.border }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={inputText}
           onChangeText={setInputText}
           placeholder="Type a message..."
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textTertiary}
           multiline
           maxLength={500}
         />
         <TouchableOpacity
-          style={[styles.sendButton, inputText.trim() === '' && styles.sendButtonDisabled]}
+          style={[styles.sendButton, { backgroundColor: inputText.trim() === '' ? colors.inputBackground : colors.primary }]}
           onPress={handleSend}
           activeOpacity={0.7}
           disabled={inputText.trim() === ''}
@@ -250,7 +297,6 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   header: {
     flexDirection: 'row',
@@ -258,28 +304,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 48,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#F3E8FF',
   },
   backButton: {
-    padding: 8,
-    marginRight: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
   },
   backIcon: {
-    fontSize: 24,
-    color: '#9333EA',
+    fontSize: 20,
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   mentorHeaderInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginLeft: 12,
   },
   smallAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#C084FC',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -295,11 +348,9 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1F2937',
   },
   headerTitle: {
     fontSize: 13,
-    color: '#6B7280',
     marginTop: 2,
   },
   messagesContainer: {
@@ -325,7 +376,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#C084FC',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
@@ -342,11 +392,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   userMessageContent: {
-    backgroundColor: '#9333EA',
     borderBottomRightRadius: 4,
   },
   mentorMessageContent: {
-    backgroundColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
   },
   messageText: {
@@ -358,35 +406,28 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   mentorMessageText: {
-    color: '#1F2937',
   },
   timestamp: {
     fontSize: 11,
   },
   userTimestamp: {
-    color: '#E9D5FF',
     textAlign: 'right',
   },
   mentorTimestamp: {
-    color: '#9CA3AF',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#F3E8FF',
   },
   input: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 15,
-    color: '#1F2937',
     maxHeight: 100,
     marginRight: 12,
   },
@@ -394,12 +435,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#9333EA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: '#D8B4FE',
   },
   sendIcon: {
     fontSize: 20,
@@ -407,7 +446,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#EF4444',
     textAlign: 'center',
     marginTop: 100,
   },
@@ -418,7 +456,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#9333EA',
     marginLeft: 8,
   },
 });

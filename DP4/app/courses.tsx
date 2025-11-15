@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTheme } from '../context/ThemeContext';
 
 interface Course {
   id: number;
@@ -764,6 +765,7 @@ const coursesData: { [key: string]: Course[] } = {
 export default function CoursesScreen() {
   const router = useRouter();
   const { career, category } = useLocalSearchParams();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   const pageId = (career || category) as string;
@@ -812,28 +814,28 @@ export default function CoursesScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
         <TouchableOpacity 
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backText}>Back</Text>
+          <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
         </TouchableOpacity>
         
-        <Text style={styles.title}>{getPageTitle()}</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.text }]}>{getPageTitle()}</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           {category ? 'Browse courses across this field' : 'Level up your skills with these recommended courses'}
         </Text>
 
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Search courses, providers, or skills..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -843,7 +845,7 @@ export default function CoursesScreen() {
               style={styles.clearButton}
               activeOpacity={0.7}
             >
-              <Text style={styles.clearIcon}>✕</Text>
+              <Text style={[styles.clearIcon, { color: colors.textTertiary }]}>✕</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -856,49 +858,49 @@ export default function CoursesScreen() {
       >
         {filteredCourses.length === 0 ? (
           <View style={styles.noResults}>
-            <Text style={styles.noResultsText}>No courses found</Text>
-            <Text style={styles.noResultsSubtext}>Try adjusting your search</Text>
+            <Text style={[styles.noResultsText, { color: colors.textSecondary }]}>No courses found</Text>
+            <Text style={[styles.noResultsSubtext, { color: colors.textTertiary }]}>Try adjusting your search</Text>
           </View>
         ) : (
           filteredCourses.map((course) => (
-            <View key={course.id} style={styles.courseCard}>
+            <View key={course.id} style={[styles.courseCard, { backgroundColor: colors.cardBackground }]}>
               <View style={styles.courseHeader}>
                 <View style={styles.courseTitleRow}>
-                  <Text style={styles.courseTitle}>{course.title}</Text>
+                  <Text style={[styles.courseTitle, { color: colors.text }]}>{course.title}</Text>
                   <View style={[styles.typeBadge, { backgroundColor: getTypeColor(course.type) }]}>
                     <Text style={styles.typeBadgeText}>{course.type}</Text>
                   </View>
                 </View>
-                <Text style={styles.provider}>by {course.provider}</Text>
+                <Text style={[styles.provider, { color: colors.primary }]}>by {course.provider}</Text>
               </View>
 
-              <Text style={styles.description}>{course.description}</Text>
+              <Text style={[styles.description, { color: colors.textSecondary }]}>{course.description}</Text>
 
               <View style={styles.courseDetails}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailIcon}>⏱️</Text>
-                  <Text style={styles.detailText}>{course.duration}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.duration}</Text>
                 </View>
                 <View style={styles.detailRow}>
                   <View style={[styles.levelDot, { backgroundColor: getLevelColor(course.level) }]} />
-                  <Text style={styles.detailText}>{course.level}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.level}</Text>
                 </View>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailIcon}>💰</Text>
-                  <Text style={styles.detailText}>{course.cost}</Text>
+                  <Text style={[styles.detailText, { color: colors.textSecondary }]}>{course.cost}</Text>
                 </View>
               </View>
 
               <View style={styles.skills}>
                 {course.skills.map((skill, index) => (
-                  <View key={index} style={styles.skillBadge}>
-                    <Text style={styles.skillText}>{skill}</Text>
+                  <View key={index} style={[styles.skillBadge, { backgroundColor: colors.primaryLight }]}>
+                    <Text style={[styles.skillText, { color: colors.primary }]}>{skill}</Text>
                   </View>
                 ))}
               </View>
 
               <TouchableOpacity 
-                style={styles.enrollButton}
+                style={[styles.enrollButton, { backgroundColor: colors.primary }]}
                 activeOpacity={0.8}
               >
                 <Text style={styles.enrollText}>Learn More</Text>
@@ -915,51 +917,46 @@ export default function CoursesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#F3E8FF',
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   backIcon: {
     fontSize: 24,
-    color: '#9333EA',
     marginRight: 8,
   },
   backText: {
     fontSize: 16,
-    color: '#9333EA',
     fontWeight: '500',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
     marginBottom: 16,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FDF2F8',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#F3E8FF',
   },
   searchIcon: {
     fontSize: 18,
@@ -968,14 +965,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#1F2937',
   },
   clearButton: {
     padding: 4,
   },
   clearIcon: {
     fontSize: 18,
-    color: '#9CA3AF',
   },
   scrollView: {
     flex: 1,
@@ -985,7 +980,6 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   courseCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -1007,7 +1001,6 @@ const styles = StyleSheet.create({
   courseTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
     flex: 1,
     marginRight: 8,
   },
@@ -1023,12 +1016,10 @@ const styles = StyleSheet.create({
   },
   provider: {
     fontSize: 14,
-    color: '#9333EA',
     fontWeight: '500',
   },
   description: {
     fontSize: 14,
-    color: '#4B5563',
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -1048,7 +1039,6 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 13,
-    color: '#6B7280',
   },
   levelDot: {
     width: 8,
@@ -1063,18 +1053,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   skillBadge: {
-    backgroundColor: '#F3E8FF',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
   },
   skillText: {
     fontSize: 12,
-    color: '#9333EA',
     fontWeight: '500',
   },
   enrollButton: {
-    backgroundColor: '#9333EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1099,12 +1086,10 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#6B7280',
     marginBottom: 8,
   },
   noResultsSubtext: {
     fontSize: 14,
-    color: '#9CA3AF',
   },
 });
 

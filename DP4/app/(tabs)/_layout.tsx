@@ -8,9 +8,11 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { savedJobsStorage, favoriteMentorsStorage, savedCoursesStorage } from '../../utils/storage';
 import { savedJobs, favoriteMentors, savedCourses } from '../../data/savedData';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { colors } = useTheme();
 
   // Initialize storage with sample data on first load
   useEffect(() => {
@@ -42,13 +44,13 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#9333EA',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: '#FDF2F8',
-          borderTopColor: '#F9A8D4',
+          backgroundColor: colors.cardBackground,
+          borderTopColor: colors.border,
           borderTopWidth: 2,
         },
       }}>

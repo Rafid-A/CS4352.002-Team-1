@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function JobBoardScreen() {
   const [filter, setFilter] = useState('All');
+  const { colors } = useTheme();
 
   const jobs = [
     {
@@ -146,10 +148,10 @@ export default function JobBoardScreen() {
     : jobs.filter(job => job.category === filter);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Job Board</Text>
-        <Text style={styles.subtitle}>Discover opportunities in your field</Text>
+        <Text style={[styles.title, { color: colors.primary }]}>Job Board</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Discover opportunities in your field</Text>
       </View>
 
       <View style={styles.filterContainer}>
@@ -163,14 +165,14 @@ export default function JobBoardScreen() {
               key={category}
               style={[
                 styles.filterButton,
-                filter === category && styles.filterButtonActive
+                { backgroundColor: filter === category ? colors.primary : colors.cardBackground, borderColor: filter === category ? colors.primary : colors.border }
               ]}
               onPress={() => setFilter(category)}
               activeOpacity={0.7}
             >
               <Text style={[
                 styles.filterText,
-                filter === category && styles.filterTextActive
+                { color: filter === category ? '#FFFFFF' : colors.textSecondary }
               ]}>
                 {category}
               </Text>
@@ -185,40 +187,40 @@ export default function JobBoardScreen() {
         contentContainerStyle={styles.jobListContainer}
       >
         {filteredJobs.map((job) => (
-          <View key={job.id} style={styles.jobCard}>
+          <View key={job.id} style={[styles.jobCard, { backgroundColor: colors.cardBackground }]}>
             <View style={styles.jobHeader}>
-              <View style={styles.companyBadge}>
-                <Text style={styles.companyInitial}>
+              <View style={[styles.companyBadge, { backgroundColor: colors.primaryLight }]}>
+                <Text style={[styles.companyInitial, { color: colors.primary }]}>
                   {job.company.charAt(0)}
                 </Text>
               </View>
               <View style={styles.jobInfo}>
-                <Text style={styles.jobTitle}>{job.title}</Text>
-                <Text style={styles.companyName}>{job.company}</Text>
+                <Text style={[styles.jobTitle, { color: colors.text }]}>{job.title}</Text>
+                <Text style={[styles.companyName, { color: colors.textSecondary }]}>{job.company}</Text>
               </View>
             </View>
 
             <View style={styles.jobDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailIcon}>📍</Text>
-                <Text style={styles.detailText}>{job.location}</Text>
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>{job.location}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailIcon}>💼</Text>
-                <Text style={styles.detailText}>{job.type}</Text>
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>{job.type}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailIcon}>💰</Text>
-                <Text style={styles.detailText}>{job.salary}</Text>
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>{job.salary}</Text>
               </View>
             </View>
 
-            <Text style={styles.jobDescription}>{job.description}</Text>
+            <Text style={[styles.jobDescription, { color: colors.textSecondary }]}>{job.description}</Text>
 
-            <View style={styles.jobFooter}>
-              <Text style={styles.postedTime}>{job.posted}</Text>
+            <View style={[styles.jobFooter, { borderTopColor: colors.border }]}>
+              <Text style={[styles.postedTime, { color: colors.textTertiary }]}>{job.posted}</Text>
               <TouchableOpacity 
-                style={styles.applyButton}
+                style={[styles.applyButton, { backgroundColor: colors.primary }]}
                 activeOpacity={0.8}
               >
                 <Text style={styles.applyButtonText}>Apply Externally</Text>
@@ -235,7 +237,6 @@ export default function JobBoardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   header: {
     paddingHorizontal: 24,
@@ -245,12 +246,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#9333EA',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
   },
   filterContainer: {
     paddingHorizontal: 24,
@@ -260,24 +259,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterButton: {
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  filterButtonActive: {
-    backgroundColor: '#9333EA',
-    borderColor: '#9333EA',
   },
   filterText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
-  },
-  filterTextActive: {
-    color: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
@@ -287,7 +276,6 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   jobCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
@@ -305,7 +293,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#F3E8FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -313,7 +300,6 @@ const styles = StyleSheet.create({
   companyInitial: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#9333EA',
   },
   jobInfo: {
     flex: 1,
@@ -322,12 +308,10 @@ const styles = StyleSheet.create({
   jobTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 4,
   },
   companyName: {
     fontSize: 14,
-    color: '#6B7280',
     fontWeight: '500',
   },
   jobDetails: {
@@ -344,11 +328,9 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: '#6B7280',
   },
   jobDescription: {
     fontSize: 14,
-    color: '#4B5563',
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -358,14 +340,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
   },
   postedTime: {
     fontSize: 12,
-    color: '#9CA3AF',
   },
   applyButton: {
-    backgroundColor: '#9333EA',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,

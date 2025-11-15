@@ -90,8 +90,8 @@ export default function FavoriteMentorsScreen() {
             onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
             activeOpacity={0.7}
           >
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backText}>Back</Text>
+            <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+            <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
           </TouchableOpacity>
           
           <Text style={[styles.title, { color: colors.text }]}>Favorite Mentors</Text>
@@ -128,8 +128,8 @@ export default function FavoriteMentorsScreen() {
 
         {/* Mentors List */}
         {filteredMentors.length > 0 ? (
-          filteredMentors.map((mentor) => (
-            <View key={mentor.id} style={[styles.mentorCard, { backgroundColor: colors.cardBackground }]}>
+          filteredMentors.map((mentor, index) => (
+            <View key={mentor.id} style={[styles.mentorCard, { backgroundColor: colors.cardBackground }, index === 0 && styles.firstMentorCard]}>
               <View style={styles.mentorHeader}>
                 <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
                   <Text style={styles.avatarText}>{mentor.initials}</Text>
@@ -157,14 +157,14 @@ export default function FavoriteMentorsScreen() {
               <View style={styles.skills}>
                 {mentor.skills.map((skill, index) => (
                   <View key={index} style={[styles.skillBadge, { backgroundColor: colors.primaryLight }]}>
-                    <Text style={styles.skillText}>{skill}</Text>
+                    <Text style={[styles.skillText, { color: colors.primary }]}>{skill}</Text>
                   </View>
                 ))}
               </View>
 
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
-                  style={styles.connectButton}
+                  style={[styles.connectButton, { backgroundColor: colors.primary }]}
                   activeOpacity={0.8}
                   onPress={() => router.push({
                     pathname: '/(tabs)/chat',
@@ -184,7 +184,7 @@ export default function FavoriteMentorsScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={styles.removeButton}
+                  style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
                   activeOpacity={0.8}
                   onPress={() => {
                     console.log('Mentor remove button pressed directly');
@@ -192,7 +192,7 @@ export default function FavoriteMentorsScreen() {
                   }}
                 >
                   <Text style={styles.removeIcon}>🗑️</Text>
-                  <Text style={styles.removeText}>Remove</Text>
+                  <Text style={[styles.removeText, { color: colors.text }]}>Remove</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -269,16 +269,18 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
     marginBottom: 16,
   },
   backIcon: {
-    fontSize: 24,
-    color: '#9333EA',
-    marginRight: 8,
+    fontSize: 20,
+    marginRight: 4,
   },
   backText: {
     fontSize: 16,
-    color: '#9333EA',
     fontWeight: '500',
   },
   title: {
@@ -342,6 +344,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+  },
+  firstMentorCard: {
+    marginTop: 24,
   },
   mentorHeader: {
     flexDirection: 'row',
@@ -429,7 +434,6 @@ const styles = StyleSheet.create({
   },
   skillText: {
     fontSize: 13,
-    color: '#9333EA',
     fontWeight: '500',
   },
   actionButtons: {
@@ -438,7 +442,6 @@ const styles = StyleSheet.create({
   },
   connectButton: {
     flex: 1,
-    backgroundColor: '#9333EA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -456,7 +459,6 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     flex: 1,
-    backgroundColor: '#FEF2F2',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -464,13 +466,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 8,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
   },
   removeIcon: {
     fontSize: 18,
   },
   removeText: {
-    color: '#DC2626',
     fontSize: 15,
     fontWeight: '600',
   },

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../context/ThemeContext';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -25,44 +27,44 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={styles.logo}>🎯</Text>
-        <Text style={styles.title}>PathFinder</Text>
-        <Text style={styles.subtitle}>Sign in to discover your career path</Text>
+        <Text style={[styles.title, { color: colors.primary }]}>PathFinder</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to discover your career path</Text>
       </View>
 
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Username</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Username</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
             placeholder="Enter your username"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
           />
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Password</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
             placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
           />
         </View>
 
         <TouchableOpacity style={styles.forgotPasswordContainer}>
-          <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>Forgot password?</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.loginButton}
+          style={[styles.loginButton, { backgroundColor: colors.primary }]}
           activeOpacity={0.8}
           onPress={handleLogin}
         >
@@ -70,15 +72,15 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>OR</Text>
-          <View style={styles.dividerLine} />
+          <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+          <Text style={[styles.dividerText, { color: colors.textTertiary }]}>OR</Text>
+          <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
         </View>
 
         <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
+          <Text style={[styles.signupText, { color: colors.textSecondary }]}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push('/register')}>
-            <Text style={styles.signupLink}>Create one</Text>
+            <Text style={[styles.signupLink, { color: colors.primary }]}>Create one</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -89,7 +91,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF2F8',
   },
   header: {
     paddingHorizontal: 24,
@@ -104,12 +105,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#9333EA',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
     textAlign: 'center',
   },
   formContainer: {
@@ -121,18 +120,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: '#1F2937',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   forgotPasswordContainer: {
     alignItems: 'flex-end',
@@ -140,11 +135,9 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#9333EA',
     fontWeight: '500',
   },
   loginButton: {
-    backgroundColor: '#9333EA',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -167,12 +160,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E5E7EB',
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: '#9CA3AF',
     fontWeight: '500',
   },
   signupContainer: {
@@ -182,11 +173,9 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 14,
-    color: '#6B7280',
   },
   signupLink: {
     fontSize: 14,
-    color: '#9333EA',
     fontWeight: '600',
   },
 });

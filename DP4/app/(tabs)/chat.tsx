@@ -39,7 +39,9 @@ export default function ChatScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
+  // Use API key from config file instead of environment variable
+  const { GEMINI_API_KEY } = require('../../config/gemini');
+  const apiKey = GEMINI_API_KEY || '';
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -248,11 +250,11 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     alignSelf: 'flex-start',
+    marginBottom: 12,
   },
   backIcon: {
     fontSize: 20,
