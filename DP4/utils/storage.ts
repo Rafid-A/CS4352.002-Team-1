@@ -29,8 +29,14 @@ export const addToStoredArray = async (key: string, item: any): Promise<void> =>
   try {
     const currentData = await getStoredArray(key);
     // Check if item already exists (by id)
-    if (!currentData.some((existing: any) => existing.id === item.id)) {
+    const existingIndex = currentData.findIndex((existing: any) => existing.id === item.id);
+    if (existingIndex === -1) {
+      // Item doesn't exist, add it
       currentData.push(item);
+      await setStoredArray(key, currentData);
+    } else {
+      // Item exists, update it with new data (merge properties)
+      currentData[existingIndex] = { ...currentData[existingIndex], ...item };
       await setStoredArray(key, currentData);
     }
   } catch (error) {

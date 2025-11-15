@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import { savedJobsStorage } from '../../utils/storage';
 
 export default function FinancialManagerPage() {
   const router = useRouter();
@@ -9,6 +10,39 @@ export default function FinancialManagerPage() {
   const fromRoute = params.from as string;
   const currentRoute = '/(tabs)/financial-manager';
   const { colors } = useTheme();
+  
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Job data for this position
+  const jobData = {
+    id: 11,
+    title: 'Financial Manager',
+    salary: '$85K - $150K',
+    growth: 'High Growth',
+    growthColor: '#9333EA'
+  };
+
+  // Check if job is already saved
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkIfSaved = async () => {
+        const saved = await savedJobsStorage.isSaved(jobData.id);
+        setIsSaved(saved);
+      };
+      checkIfSaved();
+    }, [])
+  );
+
+  // Toggle save status
+  const toggleSave = async () => {
+    if (isSaved) {
+      await savedJobsStorage.remove(jobData.id);
+      setIsSaved(false);
+    } else {
+      await savedJobsStorage.add(jobData);
+      setIsSaved(true);
+    }
+  };
 
   const responsibilities = [
     'Oversee financial operations and reporting',
@@ -29,7 +63,7 @@ export default function FinancialManagerPage() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header with Back Button */}
+        {/* Header with Back Button and Save Button */}
         <View style={styles.header}>
           <TouchableOpacity 
             onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} 
@@ -38,6 +72,15 @@ export default function FinancialManagerPage() {
           >
             <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
             <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={toggleSave} 
+            style={[styles.saveButton, { backgroundColor: colors.inputBackground }]}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.saveIcon}>{isSaved ? '❤️' : '🤍'}</Text>
+            <Text style={[styles.saveText, { color: colors.text }]}>{isSaved ? 'Saved' : 'Save'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -170,6 +213,23 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginTop: 12,
+  },
+  saveIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  saveText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   tagContainer: {
     paddingHorizontal: 24,

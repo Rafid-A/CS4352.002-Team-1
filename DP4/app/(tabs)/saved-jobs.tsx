@@ -16,6 +16,54 @@ export default function SavedJobsPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [jobToRemove, setJobToRemove] = useState<{id: number, title: string} | null>(null);
 
+  // Map job titles to their detail page routes
+  const getJobRoute = (title: string): string | null => {
+    // Normalize title by removing common prefixes and converting to lowercase for matching
+    const normalizedTitle = title.toLowerCase().trim();
+    
+    // Direct mappings
+    const routeMap: { [key: string]: string } = {
+      'data scientist': '/(tabs)/data-scientist',
+      'research scientist': '/(tabs)/research-scientist',
+      'biotech engineer': '/(tabs)/biotech-engineer',
+      'environmental scientist': '/(tabs)/environmental-scientist',
+      'ux designer': '/(tabs)/ux-designer',
+      'software engineer': '/(tabs)/software-engineer',
+      'product manager': '/(tabs)/product-manager',
+      'devops engineer': '/(tabs)/devops-engineer',
+      'illustrator': '/(tabs)/illustrator',
+      'art director': '/(tabs)/art-director',
+      'animator': '/(tabs)/animator',
+      'graphic designer': '/(tabs)/graphic-designer',
+      'financial manager': '/(tabs)/financial-manager',
+      'investment banker': '/(tabs)/investment-banker',
+      'sales manager': '/(tabs)/sales-manager',
+      'marketing manager': '/(tabs)/marketing-manager',
+    };
+    
+    // Check for exact match first
+    if (routeMap[normalizedTitle]) {
+      return routeMap[normalizedTitle];
+    }
+    
+    // Check for partial matches (e.g., "Senior UX Designer" contains "ux designer")
+    for (const [key, route] of Object.entries(routeMap)) {
+      if (normalizedTitle.includes(key) || key.includes(normalizedTitle)) {
+        return route;
+      }
+    }
+    
+    return null;
+  };
+
+  // Handle navigation to job detail page
+  const handleJobPress = (career: any) => {
+    const route = getJobRoute(career.title);
+    if (route) {
+      router.push({ pathname: route, params: { from: currentRoute } } as any);
+    }
+  };
+
   // Load saved jobs from storage
   useFocusEffect(
     React.useCallback(() => {
@@ -95,21 +143,22 @@ export default function SavedJobsPage() {
                     <TouchableOpacity 
                       style={styles.careerContent}
                       activeOpacity={0.8}
-                      onPress={() => {
-                        if (career.title === 'Illustrator') {
-                          router.push({ pathname: '/(tabs)/illustrator', params: { from: currentRoute } } as any);
-                        } else if (career.title === 'Art Director') {
-                          router.push({ pathname: '/(tabs)/art-director', params: { from: currentRoute } } as any);
-                        }
-                      }}
+                      onPress={() => handleJobPress(career)}
                     >
                       <View style={styles.careerInfo}>
                         <Text style={[styles.careerTitle, { color: colors.text }]}>{career.title}</Text>
+                        {career.company && (
+                          <Text style={[styles.companyName, { color: colors.textSecondary }]}>{career.company}</Text>
+                        )}
                         <View style={styles.careerDetails}>
                           <Text style={[styles.salaryText, { color: colors.textSecondary }]}>{career.salary}</Text>
                           <Text style={[styles.dot, { color: colors.textTertiary }]}>•</Text>
-                          <View style={[styles.growthIndicator, { backgroundColor: career.growthColor }]} />
-                          <Text style={[styles.growthText, { color: colors.textSecondary }]}>{career.growth}</Text>
+                          {career.growthColor && (
+                            <>
+                              <View style={[styles.growthIndicator, { backgroundColor: career.growthColor }]} />
+                              <Text style={[styles.growthText, { color: colors.textSecondary }]}>{career.growth}</Text>
+                            </>
+                          )}
                         </View>
                       </View>
                       <View style={[styles.arrowContainer, { backgroundColor: colors.primaryLight }]}>
@@ -249,6 +298,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#1F2937',
+    marginBottom: 4,
+  },
+  companyName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4B5563',
     marginBottom: 8,
   },
   careerDetails: {

@@ -1,10 +1,54 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { savedJobsStorage } from '../../utils/storage';
+import { useFocusEffect } from 'expo-router';
 
 export default function JobBoardScreen() {
   const [filter, setFilter] = useState('All');
+  const [savedJobIds, setSavedJobIds] = useState<Set<number>>(new Set());
   const { colors } = useTheme();
+
+  // Load saved jobs when page is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadSavedJobs = async () => {
+        const saved = await savedJobsStorage.get();
+        const ids = new Set(saved.map((job: any) => job.id));
+        setSavedJobIds(ids);
+      };
+      loadSavedJobs();
+    }, [])
+  );
+
+  // Toggle save status for a job
+  const toggleSave = async (job: any) => {
+    const isSaved = savedJobIds.has(job.id);
+    
+    if (isSaved) {
+      await savedJobsStorage.remove(job.id);
+      setSavedJobIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(job.id);
+        return newSet;
+      });
+    } else {
+      // Save job with company name included
+      const jobToSave = {
+        id: job.id,
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        type: job.type,
+        salary: job.salary,
+        category: job.category,
+        posted: job.posted,
+        description: job.description,
+      };
+      await savedJobsStorage.add(jobToSave);
+      setSavedJobIds(prev => new Set(prev).add(job.id));
+    }
+  };
 
   const jobs = [
     {
@@ -198,6 +242,15 @@ export default function JobBoardScreen() {
                 <Text style={[styles.jobTitle, { color: colors.text }]}>{job.title}</Text>
                 <Text style={[styles.companyName, { color: colors.textSecondary }]}>{job.company}</Text>
               </View>
+              <TouchableOpacity
+                onPress={() => toggleSave(job)}
+                style={styles.saveButton}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.saveIcon}>
+                  {savedJobIds.has(job.id) ? '❤️' : '🤍'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.jobDetails}>
@@ -288,6 +341,7 @@ const styles = StyleSheet.create({
   jobHeader: {
     flexDirection: 'row',
     marginBottom: 12,
+    alignItems: 'center',
   },
   companyBadge: {
     width: 48,
@@ -361,5 +415,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  saveButton: {
+    padding: 8,
+    marginLeft: 'auto',
+  },
+  saveIcon: {
+    fontSize: 20,
   },
 });

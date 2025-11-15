@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { savedJobsStorage } from '../../utils/storage';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 
@@ -23,13 +23,15 @@ export default function IllustratorPage() {
   };
 
   // Check if job is already saved
-  useEffect(() => {
-    const checkIfSaved = async () => {
-      const saved = await savedJobsStorage.isSaved(jobData.id);
-      setIsSaved(saved);
-    };
-    checkIfSaved();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkIfSaved = async () => {
+        const saved = await savedJobsStorage.isSaved(jobData.id);
+        setIsSaved(saved);
+      };
+      checkIfSaved();
+    }, [])
+  );
 
   // Toggle save status
   const toggleSave = async () => {
@@ -62,7 +64,7 @@ export default function IllustratorPage() {
     <View style={globalStyles.container}>
       <ScrollView style={globalStyles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header with Back Button and Save Button */}
-        <View style={globalStyles.header}>
+        <View style={styles.header}>
           <TouchableOpacity 
             onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} 
             style={globalStyles.backButton}
@@ -185,12 +187,18 @@ export default function IllustratorPage() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 48,
+    paddingBottom: 16,
+  },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   saveIcon: {
     fontSize: 16,
