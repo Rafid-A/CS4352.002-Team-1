@@ -74,7 +74,13 @@ Your expertise includes: ${mentorSkills}.
 Respond as this mentor character, providing helpful career advice and insights based on your experience. 
 Keep responses concise and conversational (2-3 sentences max).`;
 
-      const response = await fetch(
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - the API took too long to respond')), 30000); // 30 second timeout
+      });
+
+      // Create the fetch promise
+      const fetchPromise = fetch(
         `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent`,
         {
           method: 'POST',
@@ -92,10 +98,33 @@ Keep responses concise and conversational (2-3 sentences max).`;
             generationConfig: {
               temperature: 0.7,
               maxOutputTokens: 500,
-            }
+              topP: 0.8,
+              topK: 40,
+            },
+            safetySettings: [
+              {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              }
+            ]
           }),
         }
       );
+
+      // Race between fetch and timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -103,13 +132,43 @@ Keep responses concise and conversational (2-3 sentences max).`;
       }
 
       const data = await response.json();
-      const mentorResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                            "I'm having trouble responding right now. Please try again.";
+      
+      // Better error handling for API response
+      let mentorResponse = '';
+      
+      // Check for blocked/filtered content
+      if (data.candidates && data.candidates.length > 0) {
+        const candidate = data.candidates[0];
+        
+        // Check if response was blocked by safety filters
+        if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION') {
+          mentorResponse = "I apologize, but I can't respond to that particular question. Could you try rephrasing it?";
+        } else if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+          mentorResponse = candidate.content.parts[0].text || '';
+        }
+      }
+      
+      // Check for prompt feedback (alternative response structure)
+      if (!mentorResponse && data.promptFeedback) {
+        console.log('Prompt feedback:', data.promptFeedback);
+        mentorResponse = "I apologize, but I'm having trouble processing that request. Could you try asking in a different way?";
+      }
+      
+      // If still no response, check for errors in the response
+      if (!mentorResponse) {
+        console.log('Full API response:', JSON.stringify(data, null, 2));
+        
+        if (data.error) {
+          mentorResponse = `I apologize, but I encountered an error: ${data.error.message || 'Unknown error'}. Please try again.`;
+        } else {
+          mentorResponse = "I'm having trouble responding right now. Please try again.";
+        }
+      }
 
       // Add mentor response
       const newMentorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: mentorResponse,
+        text: mentorResponse.trim(),
         sender: 'mentor',
         timestamp: new Date(),
       };
