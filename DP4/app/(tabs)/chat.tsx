@@ -97,7 +97,7 @@ Keep responses concise and conversational (2-3 sentences max).`;
             ],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 500,
+              maxOutputTokens: 1024,
               topP: 0.8,
               topK: 40,
             },
@@ -140,11 +140,28 @@ Keep responses concise and conversational (2-3 sentences max).`;
       if (data.candidates && data.candidates.length > 0) {
         const candidate = data.candidates[0];
         
+        // Debug logging
+        console.log('Finish reason:', candidate.finishReason);
+        console.log('Number of parts:', candidate.content?.parts?.length || 0);
+        
         // Check if response was blocked by safety filters
         if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION') {
           mentorResponse = "I apologize, but I can't respond to that particular question. Could you try rephrasing it?";
         } else if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-          mentorResponse = candidate.content.parts[0].text || '';
+          // Combine all parts of the response (in case it's split across multiple parts)
+          mentorResponse = candidate.content.parts
+            .map((part: any) => part.text || '')
+            .join('')
+            .trim();
+          
+          console.log('Extracted response length:', mentorResponse.length);
+          console.log('Full response preview:', mentorResponse.substring(0, 100));
+          
+          // Check if response was truncated due to token limit
+          if (candidate.finishReason === 'MAX_TOKENS') {
+            console.log('Response was truncated due to token limit');
+            // Optionally add a note, but for now just use what we got
+          }
         }
       }
       
