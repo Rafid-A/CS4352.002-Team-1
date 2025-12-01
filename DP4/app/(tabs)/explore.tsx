@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { savedJobsStorage } from '../../utils/storage';
-import { useFocusEffect } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 
 export default function JobBoardScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const fromRoute = params.from as string;
   const [filter, setFilter] = useState('All');
   const [savedJobIds, setSavedJobIds] = useState<Set<number>>(new Set());
   const { colors } = useTheme();
@@ -194,6 +197,14 @@ export default function JobBoardScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
+          onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+        </TouchableOpacity>
         <Text style={[styles.title, { color: colors.primary }]}>Job Board</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Discover opportunities in your field</Text>
       </View>
@@ -250,6 +261,9 @@ export default function JobBoardScreen() {
                 <Text style={styles.saveIcon}>
                   {savedJobIds.has(job.id) ? '❤️' : '🤍'}
                 </Text>
+                <Text style={[styles.saveText, { color: colors.textSecondary }]}>
+                  {savedJobIds.has(job.id) ? 'Saved' : 'Save'}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -295,6 +309,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 16,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  backIcon: {
+    fontSize: 20,
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   title: {
     fontSize: 28,
@@ -419,8 +450,17 @@ const styles = StyleSheet.create({
   saveButton: {
     padding: 8,
     marginLeft: 'auto',
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   saveIcon: {
     fontSize: 20,
+    marginRight: 4,
+  },
+  saveText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
 });

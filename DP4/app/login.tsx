@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
 
@@ -8,6 +8,7 @@ export default function LoginScreen() {
   const { colors } = useTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
     if (username.trim() === '' || password.trim() === '') {
@@ -15,15 +16,22 @@ export default function LoginScreen() {
       return;
     }
 
+    setIsLoading(true);
+
     // Store username for profile page
     try {
       const AsyncStorage = require('@react-native-async-storage/async-storage').default;
       await AsyncStorage.setItem('username', username.trim());
+      // Simulate network delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.log('Error storing username:', error);
     }
 
     router.replace('/(tabs)' as any);
+    // We don't set isLoading(false) here because we're navigating away, 
+    // and setting state on an unmounted component can cause warnings.
+    // If navigation fails, the user is stuck, but router.replace usually works.
   };
 
   return (
@@ -64,11 +72,16 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.loginButton, { backgroundColor: colors.primary }]}
-          activeOpacity={0.8}
+          style={[styles.loginButton, { backgroundColor: colors.primary, opacity: isLoading ? 0.8 : 1 }]}
+          activeOpacity={0.7}
           onPress={handleLogin}
+          disabled={isLoading}
         >
-          <Text style={styles.loginButtonText}>Sign In</Text>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={styles.loginButtonText}>Sign In</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.divider}>
@@ -79,7 +92,7 @@ export default function LoginScreen() {
 
         <View style={styles.signupContainer}>
           <Text style={[styles.signupText, { color: colors.textSecondary }]}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => router.push('/register')}>
+          <TouchableOpacity onPress={() => router.push('/register')} activeOpacity={0.6}>
             <Text style={[styles.signupLink, { color: colors.primary }]}>Create one</Text>
           </TouchableOpacity>
         </View>

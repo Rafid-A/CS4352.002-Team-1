@@ -133,8 +133,11 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
 
-  const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+  // Calculate progress based on completed answers, not just current question index
+  // This ensures 100% is only reached when all questions are answered
+  const progress = (answers.length / quizQuestions.length) * 100;
 
   const handleSelectOption = (optionIndex: number) => {
     setSelectedOption(optionIndex);
@@ -193,6 +196,11 @@ export default function QuizPage() {
     return messages[topAnswer];
   };
 
+  const getAnswerText = (questionIndex: number, answerLetter: string) => {
+    const optionIndex = answerLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+    return quizQuestions[questionIndex].options[optionIndex];
+  };
+
   if (showResults) {
     const topAnswer = getTopAnswer();
     const recommendations = careerRecommendations[topAnswer];
@@ -214,6 +222,34 @@ export default function QuizPage() {
               <Text style={[styles.resultCategory, { color: colors.primary }]}>{resultMessage.category}</Text>
               <Text style={[styles.resultDescription, { color: colors.textSecondary }]}>{resultMessage.description}</Text>
             </View>
+
+            <TouchableOpacity 
+              style={[styles.viewAnswersButton, { borderColor: colors.border, backgroundColor: colors.cardBackground }]}
+              onPress={() => setShowAnswers(!showAnswers)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.viewAnswersText, { color: colors.text }]}>
+                {showAnswers ? 'Hide Your Answers' : 'View Your Answers'}
+              </Text>
+              <Text style={[styles.viewAnswersIcon, { color: colors.text }]}>
+                {showAnswers ? '▲' : '▼'}
+              </Text>
+            </TouchableOpacity>
+
+            {showAnswers && (
+              <View style={[styles.answersContainer, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+                {quizQuestions.map((q, index) => (
+                  <View key={index} style={styles.answerItem}>
+                    <Text style={[styles.answerQuestion, { color: colors.text }]}>
+                      Q{index + 1}: {q.question}
+                    </Text>
+                    <Text style={[styles.answerSelected, { color: colors.primary }]}>
+                      {getAnswerText(index, answers[index])}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
 
             <Text style={[styles.recommendationsTitle, { color: colors.text }]}>Recommended Careers for You:</Text>
             <View style={styles.careersList}>
@@ -441,6 +477,43 @@ const styles = StyleSheet.create({
   resultDescription: {
     fontSize: 16,
     lineHeight: 24,
+  },
+  viewAnswersButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 24,
+  },
+  viewAnswersText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  viewAnswersIcon: {
+    fontSize: 14,
+  },
+  answersContainer: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 24,
+    gap: 16,
+  },
+  answerItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+    paddingBottom: 12,
+  },
+  answerQuestion: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  answerSelected: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   recommendationsTitle: {
     fontSize: 20,

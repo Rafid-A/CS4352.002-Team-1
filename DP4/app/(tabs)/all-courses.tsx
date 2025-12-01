@@ -118,6 +118,14 @@ export default function AllCoursesScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
+        <TouchableOpacity 
+          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
+          onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+        </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>All Courses</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Explore {allCoursesData.length}+ courses across all career paths</Text>
 
@@ -202,6 +210,9 @@ export default function AllCoursesScreen() {
                   <Text style={styles.saveIcon}>
                     {savedCourseIds.has(course.id) ? '❤️' : '🤍'}
                   </Text>
+                  <Text style={[styles.saveText, { color: colors.textSecondary }]}>
+                    {savedCourseIds.has(course.id) ? 'Saved' : 'Save'}
+                  </Text>
                 </TouchableOpacity>
               </View>
 
@@ -259,6 +270,23 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     paddingBottom: 16,
     borderBottomWidth: 1,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  backIcon: {
+    fontSize: 20,
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   title: {
     fontSize: 28,
@@ -344,9 +372,18 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     padding: 8,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   saveIcon: {
-    fontSize: 24,
+    fontSize: 20,
+    marginRight: 4,
+  },
+  saveText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   courseTitleRow: {
     flexDirection: 'row',

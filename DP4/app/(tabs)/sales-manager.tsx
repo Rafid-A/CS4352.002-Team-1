@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import JobFooter from '../../components/JobFooter';
 import { savedJobsStorage } from '../../utils/storage';
 
 export default function SalesManagerPage() {
@@ -161,27 +162,7 @@ export default function SalesManagerPage() {
       </ScrollView>
 
       {/* Bottom Buttons */}
-      <View style={[styles.buttonsContainer, { backgroundColor: colors.cardBackground, borderTopColor: colors.border }]}>
-        <TouchableOpacity 
-          style={[styles.mentorButton, { backgroundColor: colors.primary }]} 
-          activeOpacity={0.8}
-          onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
-        >
-          <Text style={styles.mentorButtonText}>Find a Mentor</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.coursesButton} 
-          activeOpacity={0.8}
-          onPress={() => router.push('/courses?career=sales-manager' as any)}
-        >
-          <Text style={styles.coursesButtonText}>View Courses & Certifications</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.quizButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]} activeOpacity={0.8} onPress={() => router.push({ pathname: '/(tabs)/quiz', params: { from: currentRoute } } as any)}>
-          <Text style={[styles.quizButtonText, { color: colors.text }]}>Take Career Quiz</Text>
-        </TouchableOpacity>
-      </View>
+      <JobFooter currentRoute={currentRoute} careerName="sales-manager" />
     </View>
   );
 }

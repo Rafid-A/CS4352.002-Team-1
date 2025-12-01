@@ -9,6 +9,7 @@ export default function MentorsScreen() {
   const params = useLocalSearchParams();
   const fromRoute = params.from as string;
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'connected' | 'not-connected'>('not-connected');
   const [favoritedMentorIds, setFavoritedMentorIds] = useState<Set<number>>(new Set());
   const { colors } = useTheme();
 
@@ -270,11 +271,20 @@ export default function MentorsScreen() {
 
   const filteredMentors = mentors.filter((mentor) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       mentor.name.toLowerCase().includes(query) ||
       mentor.title.toLowerCase().includes(query) ||
       mentor.company.toLowerCase().includes(query)
     );
+
+    if (!matchesSearch) return false;
+
+    if (filterType === 'connected') {
+      return favoritedMentorIds.has(mentor.id);
+    } else if (filterType === 'not-connected') {
+      return !favoritedMentorIds.has(mentor.id);
+    }
+    return true;
   });
 
   return (
@@ -311,6 +321,59 @@ export default function MentorsScreen() {
             </TouchableOpacity>
           )}
         </View>
+
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[
+              styles.filterButton, 
+              filterType === 'not-connected' ? 
+                { backgroundColor: colors.primary } : 
+                { backgroundColor: colors.inputBackground }
+            ]}
+            onPress={() => setFilterType('not-connected')}
+          >
+            <Text style={[
+              styles.filterText, 
+              filterType === 'not-connected' ? 
+                { color: '#fff' } : 
+                { color: colors.textSecondary }
+            ]}>Discover</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[
+              styles.filterButton, 
+              filterType === 'connected' ? 
+                { backgroundColor: colors.primary } : 
+                { backgroundColor: colors.inputBackground }
+            ]}
+            onPress={() => setFilterType('connected')}
+          >
+            <Text style={[
+              styles.filterText, 
+              filterType === 'connected' ? 
+                { color: '#fff' } : 
+                { color: colors.textSecondary }
+            ]}>Connected</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterButton, 
+              filterType === 'all' ? 
+                { backgroundColor: colors.primary } : 
+                { backgroundColor: colors.inputBackground }
+            ]}
+            onPress={() => setFilterType('all')}
+          >
+            <Text style={[
+              styles.filterText, 
+              filterType === 'all' ? 
+                { color: '#fff' } : 
+                { color: colors.textSecondary }
+            ]}>All</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView 
@@ -346,6 +409,9 @@ export default function MentorsScreen() {
               >
                 <Text style={styles.favoriteIcon}>
                   {favoritedMentorIds.has(mentor.id) ? '❤️' : '🤍'}
+                </Text>
+                <Text style={[styles.favoriteText, { color: colors.textSecondary }]}>
+                  {favoritedMentorIds.has(mentor.id) ? 'Saved' : 'Save'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -468,9 +534,18 @@ const styles = StyleSheet.create({
   favoriteButton: {
     padding: 8,
     alignSelf: 'flex-start',
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   favoriteIcon: {
-    fontSize: 24,
+    fontSize: 20,
+    marginRight: 4,
+  },
+  favoriteText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   mentorName: {
     fontSize: 18,
@@ -564,11 +639,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginTop: 16,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  filterText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   searchIcon: {
     fontSize: 18,

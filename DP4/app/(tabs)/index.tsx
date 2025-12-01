@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Keyboard } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Keyboard, Alert, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -8,7 +8,6 @@ export default function PathFinderApp() {
   const router = useRouter();
   const currentRoute = '/(tabs)/';
   const [searchQuery, setSearchQuery] = useState('');
-  const [menuOpen, setMenuOpen] = useState(false);
   const { colors } = useTheme();
 
   const interests = [
@@ -59,8 +58,28 @@ export default function PathFinderApp() {
   ];
 
   const handleLogout = () => {
-    setMenuOpen(false);
-    router.replace('/login' as any);
+    if (Platform.OS === 'web') {
+      const confirm = window.confirm("Are you sure you want to log out?");
+      if (confirm) {
+        router.replace('/login' as any);
+      }
+    } else {
+      Alert.alert(
+        "Logout",
+        "Are you sure you want to log out?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          { 
+            text: "Logout", 
+            onPress: () => router.replace('/login' as any),
+            style: "destructive"
+          }
+        ]
+      );
+    }
   };
   const filteredCareers = searchQuery.trim()
     ? allCareers
@@ -96,7 +115,7 @@ export default function PathFinderApp() {
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        scrollEnabled={searchQuery.trim() === ''}
+        scrollEnabled={true}
       >
         <View style={[styles.header, { backgroundColor: colors.background }]}>
           <View style={styles.headerTop}>
@@ -105,11 +124,12 @@ export default function PathFinderApp() {
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Discover your dream career path</Text>
             </View>
             <TouchableOpacity 
-              style={[styles.hamburgerButton, { backgroundColor: colors.primaryLight }]}
-              onPress={() => setMenuOpen(!menuOpen)}
+              style={[styles.logoutButton, { backgroundColor: colors.primaryLight }]}
+              onPress={handleLogout}
               activeOpacity={0.7}
             >
-              <Text style={styles.hamburgerIcon}>☰</Text>
+              <Text style={[styles.logoutText, { color: colors.primary }]}>Logout</Text>
+              <Text style={styles.logoutIcon}>🚪</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -125,6 +145,50 @@ export default function PathFinderApp() {
               placeholderTextColor={colors.textTertiary}
             />
           </View>
+          {searchQuery.trim() !== '' && (
+            <View style={[styles.searchResultsDropdown, { backgroundColor: colors.cardBackground }]}>
+              {filteredCareers.length > 0 ? (
+                <>
+                  <Text style={[styles.searchResultsTitle, { color: colors.text }]}>
+                    Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
+                  </Text>
+                  <ScrollView 
+                    style={styles.searchResultsScroll}
+                    showsVerticalScrollIndicator={true}
+                    nestedScrollEnabled={true}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={false}
+                  >
+                    <View style={styles.searchResultsList}>
+                      {filteredCareers.map((career, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[styles.searchResultCard, { backgroundColor: colors.primaryLight, borderColor: colors.border }]}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          Keyboard.dismiss(); // Dismiss keyboard first
+                          router.push(career.route as any);
+                          // Delay clearing search to keep dropdown visible during transition
+                          setTimeout(() => setSearchQuery(''), 300);
+                        }}
+                      >
+                          <View>
+                            <Text style={[styles.searchResultTitle, { color: colors.text }]}>{career.title}</Text>
+                            <Text style={[styles.searchResultCategory, { color: colors.textSecondary }]}>{career.category}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </ScrollView>
+                </>
+              ) : (
+                <View style={[styles.noResultsContainer, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+                  <Text style={[styles.noResultsText, { color: colors.text }]}>No careers found for "{searchQuery}"</Text>
+                  <Text style={[styles.noResultsSubtext, { color: colors.textSecondary }]}>Try searching for a different career or category</Text>
+                </View>
+              )}
+            </View>
+          )}
         </View>
 
         <View style={styles.quizContainer}>
@@ -140,7 +204,7 @@ export default function PathFinderApp() {
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore by Interest</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore by Job Category</Text>
           <View style={styles.interestGrid}>
             {interests.map((interest, index) => (
               <TouchableOpacity
@@ -275,66 +339,6 @@ export default function PathFinderApp() {
         </View>
       </ScrollView>
 
-      {menuOpen && (
-        <View style={[styles.dropdownMenu, { backgroundColor: colors.cardBackground }]}>
-          <TouchableOpacity 
-            style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.menuItemIcon}>🚪</Text>
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {searchQuery.trim() !== '' && (
-        <View style={[styles.searchResultsDropdown, { backgroundColor: colors.cardBackground }]}>
-          {filteredCareers.length > 0 ? (
-            <>
-              <Text style={[styles.searchResultsTitle, { color: colors.text }]}>
-                Found {filteredCareers.length} result{filteredCareers.length !== 1 ? 's' : ''}
-              </Text>
-              <ScrollView 
-                style={styles.searchResultsScroll}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-                bounces={false}
-              >
-                <View style={styles.searchResultsList}>
-                  {filteredCareers.map((career, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[styles.searchResultCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      Keyboard.dismiss(); // Dismiss keyboard first
-                      router.push(career.route as any);
-                      // Delay clearing search to keep dropdown visible during transition
-                      setTimeout(() => setSearchQuery(''), 300);
-                    }}
-                  >
-                      <View>
-                        <Text style={[styles.searchResultTitle, { color: colors.text }]}>{career.title}</Text>
-                        <Text style={[styles.searchResultCategory, { color: colors.textSecondary }]}>{career.category}</Text>
-                      </View>
-                      <View style={[styles.searchResultArrow, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={styles.searchResultArrowIcon}>→</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </>
-          ) : (
-            <View style={[styles.noResultsContainer, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
-              <Text style={[styles.noResultsText, { color: colors.text }]}>No careers found for "{searchQuery}"</Text>
-              <Text style={[styles.noResultsSubtext, { color: colors.textSecondary }]}>Try searching for a different career or category</Text>
-            </View>
-          )}
-        </View>
-      )}
 
       {/* <View style={styles.mentorButtonContainer}>
         <TouchableOpacity 
@@ -362,7 +366,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 24,
-    zIndex: 1001, // Above dropdown
+    zIndex: 1005, // Above dropdown and search
     backgroundColor: '#FDF2F8', // Match container background
   },
   headerTop: {
@@ -373,50 +377,26 @@ const styles = StyleSheet.create({
   headerTextContainer: {
     flex: 1,
   },
-  hamburgerButton: {
+  logoutButton: {
     backgroundColor: '#F3E8FF',
     borderRadius: 8,
-    width: 40,
+    paddingHorizontal: 12,
     height: 40,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
   },
-  hamburgerIcon: {
-    fontSize: 24,
+  logoutIcon: {
+    fontSize: 20,
     color: '#9333EA',
     fontWeight: '600',
   },
-  dropdownMenu: {
-    position: 'absolute',
-    top: 100, // Position below the hamburger button
-    right: 24, // Align with right edge
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    minWidth: 140,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    zIndex: 1002, // Above everything else
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-  },
-  menuItemIcon: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-  menuItemText: {
-    fontSize: 15,
-    color: '#1F2937',
-    fontWeight: '500',
+  logoutText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9333EA',
+    marginRight: 8,
   },
   title: {
     fontSize: 28,
@@ -579,10 +559,7 @@ const styles = StyleSheet.create({
   },
   // Search Results Styles
   searchResultsDropdown: {
-    position: 'absolute',
-    top: 175, // Position below the search bar (header + search bar + gap)
-    left: 24, // Match search container padding
-    right: 24, // Match search container padding
+    marginTop: 8,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 12,
@@ -591,7 +568,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
-    zIndex: 999, // Lower than search bar
   },
   searchResultsTitle: {
     fontSize: 14,

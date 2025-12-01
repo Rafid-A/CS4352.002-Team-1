@@ -93,8 +93,18 @@ export default function ProfileScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Profile</Text>
-          <TouchableOpacity 
+          <View>
+            <TouchableOpacity 
+              style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
+              onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
+              <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>Profile</Text>
+          </View>
+          <TouchableOpacity  
             style={styles.editButton}
             activeOpacity={0.7}
             onPress={() => {/* Edit profile logic */}}
@@ -146,7 +156,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Settings Section */}
-        <View style={styles.section}>
+        <View style={[styles.section, styles.settingsSection, { borderColor: colors.border }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>⚙️ Settings & Preferences</Text>
           
           <View style={[styles.settingItem, { backgroundColor: colors.cardBackground }]}>
@@ -241,10 +251,27 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start', // Changed from center to flex-start to accommodate back button
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 16,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  backIcon: {
+    fontSize: 20,
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   headerTitle: {
     fontSize: 28,
@@ -347,6 +374,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginBottom: 24,
   },
+  settingsSection: {
+    borderWidth: 2,
+    borderRadius: 16,
+    paddingVertical: 20,
+    marginHorizontal: 24,
+    paddingHorizontal: 16, // Override default padding
+    marginBottom: 24,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -354,9 +389,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
     color: '#1F2937',
+    marginBottom: 16,
   },
   viewAllButton: {
     fontSize: 14,

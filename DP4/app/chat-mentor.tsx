@@ -390,6 +390,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 16,
+    flexShrink: 1,
   },
   userMessageContent: {
     borderBottomRightRadius: 4,
