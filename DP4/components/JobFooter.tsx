@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from './ui/Button';
 
 interface JobFooterProps {
   currentRoute: string;
@@ -34,29 +35,23 @@ export default function JobFooter({ currentRoute, careerName }: JobFooterProps) 
 
       {!isCollapsed && (
         <View style={styles.buttonsContainer}>
-           <TouchableOpacity 
-            style={[styles.mentorButton, { backgroundColor: colors.primary }]}
-            activeOpacity={0.8}
+          <Button
+            title="Find a Mentor"
+            variant="primary"
             onPress={() => router.push({ pathname: '/(tabs)/mentors', params: { from: currentRoute } } as any)}
-          >
-            <Text style={styles.mentorButtonText}>Find a Mentor</Text>
-          </TouchableOpacity>
+          />
 
-          <TouchableOpacity 
-            style={styles.coursesButton} 
-            activeOpacity={0.8}
+          <Button
+            title="View Courses & Certifications"
+            variant="secondary"
             onPress={() => router.push(`/courses?career=${careerName}` as any)}
-          >
-            <Text style={styles.coursesButtonText}>View Courses & Certifications</Text>
-          </TouchableOpacity>
+          />
           
-          <TouchableOpacity 
-            style={[styles.quizButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]} 
-            activeOpacity={0.8} 
+          <Button
+            title="Take Career Quiz"
+            variant="outline"
             onPress={() => router.push({ pathname: '/(tabs)/quiz', params: { from: currentRoute } } as any)}
-          >
-            <Text style={[styles.quizButtonText, { color: colors.text }]}>Take Career Quiz</Text>
-          </TouchableOpacity>
+          />
         </View>
       )}
     </View>
@@ -96,37 +91,6 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingTop: 12,
     gap: 12,
-  },
-  mentorButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  mentorButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  coursesButton: {
-    backgroundColor: '#3B82F6',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  coursesButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  quizButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1.5,
-  },
-  quizButtonText: {
-    fontWeight: '600',
-    fontSize: 16,
   },
 });
 

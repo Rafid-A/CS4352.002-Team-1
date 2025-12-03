@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { favoriteMentorsStorage } from '../../utils/storage';
 import { useTheme } from '../../context/ThemeContext';
+import { Button } from '../../components/ui/Button';
 
 export default function MentorsScreen() {
   const router = useRouter();
@@ -437,14 +438,12 @@ export default function MentorsScreen() {
               ))}
             </View>
 
-            <TouchableOpacity 
-              style={styles.connectButton}
-              activeOpacity={0.8}
+            <Button
+              title={`Connect with ${mentor.name.split(' ')[0]}`}
+              leftIcon={<Text style={{ fontSize: 18 }}>💬</Text>}
               onPress={() => router.push(`/chat-mentor?mentorId=${mentor.id}` as any)}
-            >
-              <Text style={styles.connectIcon}>💬</Text>
-              <Text style={styles.connectText}>Connect with {mentor.name.split(' ')[0]}</Text>
-            </TouchableOpacity>
+              variant="primary"
+            />
           </View>
           ))
         )}

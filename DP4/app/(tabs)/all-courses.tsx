@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { savedCoursesStorage } from '../../utils/storage';
 import { useTheme } from '../../context/ThemeContext';
+import { Button } from '../../components/ui/Button';
 
 interface Course {
   id: number;
@@ -160,7 +161,7 @@ export default function AllCoursesScreen() {
               key={category}
               style={[
                 styles.filterChip,
-                { backgroundColor: selectedCategory === category ? colors.primary : colors.primaryLight },
+                { backgroundColor: selectedCategory === category ? colors.primary : colors.inputBackground },
                 selectedCategory === category && styles.filterChipActive
               ]}
               onPress={() => setSelectedCategory(category)}
@@ -168,7 +169,7 @@ export default function AllCoursesScreen() {
             >
               <Text style={[
                 styles.filterChipText,
-                { color: selectedCategory === category ? colors.text : colors.primary },
+                { color: selectedCategory === category ? '#FFFFFF' : colors.textSecondary },
                 selectedCategory === category && styles.filterChipTextActive
               ]}>
                 {category}
@@ -246,13 +247,11 @@ export default function AllCoursesScreen() {
                 )}
               </View>
 
-              <TouchableOpacity 
-                style={[styles.enrollButton, { backgroundColor: colors.primary }]}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.enrollText}>Learn More</Text>
-                <Text style={styles.enrollIcon}>→</Text>
-              </TouchableOpacity>
+              <Button
+                title="Learn More"
+                rightIcon={<Text style={{ color: '#FFFFFF', fontSize: 18 }}>→</Text>}
+                variant="primary"
+              />
             </View>
           ))
         )}

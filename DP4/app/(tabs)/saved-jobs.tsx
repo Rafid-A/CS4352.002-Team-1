@@ -140,11 +140,7 @@ export default function SavedJobsPage() {
               {careers.length > 0 ? (
                 careers.map((career, index) => (
                   <View key={index} style={[styles.careerCard, { backgroundColor: colors.cardBackground }]}>
-                    <TouchableOpacity 
-                      style={styles.careerContent}
-                      activeOpacity={0.8}
-                      onPress={() => handleJobPress(career)}
-                    >
+                    <View style={styles.careerContent}>
                       <View style={styles.careerInfo}>
                         <Text style={[styles.careerTitle, { color: colors.text }]}>{career.title}</Text>
                         {career.company && (
@@ -161,21 +157,27 @@ export default function SavedJobsPage() {
                           )}
                         </View>
                       </View>
-                      <View style={[styles.arrowContainer, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={[styles.arrowIcon, { color: colors.primary }]}>→</Text>
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderTopColor: colors.border }]}
-                      onPress={() => {
-                        console.log('Remove button pressed directly');
-                        handleRemoveJob(career.id, career.title);
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.removeIcon}>🗑️</Text>
-                      <Text style={[styles.removeText, { color: colors.text }]}>Remove</Text>
-                    </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.actionButtons}>
+                      <TouchableOpacity 
+                        style={[styles.detailButton, { backgroundColor: colors.primary }]}
+                        activeOpacity={0.8}
+                        onPress={() => handleJobPress(career)}
+                      >
+                        <Text style={styles.detailButtonText}>View Details</Text>
+                        <Text style={styles.detailButtonIcon}>→</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
+                        onPress={() => handleRemoveJob(career.id, career.title)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.removeIcon}>🗑️</Text>
+                        <Text style={[styles.removeText, { color: colors.text }]}>Remove</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 ))
               ) : (
@@ -287,9 +289,7 @@ const styles = StyleSheet.create({
   },
   careerContent: {
     padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingBottom: 8, // Reduced padding to accommodate buttons below
   },
   careerInfo: {
     flex: 1,
@@ -330,26 +330,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4B5563',
   },
-  arrowContainer: {
-    backgroundColor: '#E0E7FF',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+  actionButtons: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
   },
-  arrowIcon: {
-    fontSize: 20,
-  },
-  removeButton: {
+  detailButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    width: '100%',
-    minHeight: 44, // Ensure minimum touch target
+    borderRadius: 12,
+    gap: 8,
+  },
+  detailButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  detailButtonIcon: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  removeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
     gap: 8,
   },
   removeIcon: {

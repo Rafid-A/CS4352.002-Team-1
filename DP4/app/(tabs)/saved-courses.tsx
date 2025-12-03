@@ -157,12 +157,10 @@ export default function SavedCoursesScreen() {
                 <TouchableOpacity 
                   style={[styles.removeButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
                   activeOpacity={0.8}
-                  onPress={() => {
-                    console.log('Course remove button pressed directly');
-                    handleRemoveCourse(course.id, course.title);
-                  }}
+                  onPress={() => handleRemoveCourse(course.id, course.title)}
                 >
                   <Text style={styles.removeIcon}>🗑️</Text>
+                  <Text style={[styles.removeText, { color: colors.text }]}>Remove</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -366,15 +364,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   removeButton: {
-    width: 48,
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
+    gap: 8,
   },
   removeIcon: {
     fontSize: 18,
+  },
+  removeText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   noResults: {
     flex: 1,

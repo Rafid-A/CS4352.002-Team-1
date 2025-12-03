@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from '../components/ui/Button';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -10,8 +11,9 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (username.trim() === '' || password.trim() === '') {
       Alert.alert('Oops!', 'Please enter at least a username and password');
       return;
@@ -21,6 +23,10 @@ export default function RegisterScreen() {
       Alert.alert('Error', 'Passwords do not match!');
       return;
     }
+
+    setIsLoading(true);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     router.replace('/(tabs)' as any);
   };
@@ -92,13 +98,13 @@ export default function RegisterScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={[styles.registerButton, { backgroundColor: colors.primary }]}
-            activeOpacity={0.8}
+          <Button
+            title="Create Account"
             onPress={handleRegister}
-          >
-            <Text style={styles.registerButtonText}>Create Account</Text>
-          </TouchableOpacity>
+            isLoading={isLoading}
+            variant="primary"
+            style={styles.registerButton}
+          />
 
           <View style={styles.divider}>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />

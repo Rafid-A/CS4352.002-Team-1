@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from '../components/ui/Button';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -71,18 +72,13 @@ export default function LoginScreen() {
           <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>Forgot password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.loginButton, { backgroundColor: colors.primary, opacity: isLoading ? 0.8 : 1 }]}
-          activeOpacity={0.7}
+        <Button
+          title="Sign In"
           onPress={handleLogin}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.loginButtonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
+          isLoading={isLoading}
+          variant="primary"
+          style={styles.loginButton}
+        />
 
         <View style={styles.divider}>
           <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />

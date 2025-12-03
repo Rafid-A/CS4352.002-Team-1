@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { savedJobs, favoriteMentors, savedCourses } from '../../data/savedData';
 import { savedJobsStorage, favoriteMentorsStorage, savedCoursesStorage } from '../../utils/storage';
 import { useTheme } from '../../context/ThemeContext';
+import { Button } from '../../components/ui/Button';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -201,33 +202,44 @@ export default function ProfileScreen() {
 
         {/* Action Buttons */}
         <View style={styles.section}>
-          <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.cardBackground }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.actionButtonIcon}>🔒</Text>
-            <Text style={[styles.actionButtonText, { color: colors.text }]}>Privacy & Security</Text>
-          </TouchableOpacity>
+          <Button
+            title="Privacy & Security"
+            variant="outline"
+            leftIcon={<Text style={{ fontSize: 20 }}>🔒</Text>}
+            style={{ 
+              justifyContent: 'flex-start', 
+              backgroundColor: colors.cardBackground, 
+              borderWidth: 0,
+              marginBottom: 12,
+              paddingVertical: 16
+            }}
+            textStyle={{ color: colors.text, fontSize: 15, fontWeight: '500' }}
+          />
 
-          <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.cardBackground }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.actionButtonIcon}>❓</Text>
-            <Text style={[styles.actionButtonText, { color: colors.text }]}>Help & Support</Text>
-          </TouchableOpacity>
+          <Button
+            title="Help & Support"
+            variant="outline"
+            leftIcon={<Text style={{ fontSize: 20 }}>❓</Text>}
+            style={{ 
+              justifyContent: 'flex-start', 
+              backgroundColor: colors.cardBackground, 
+              borderWidth: 0,
+              marginBottom: 12,
+              paddingVertical: 16
+            }}
+            textStyle={{ color: colors.text, fontSize: 15, fontWeight: '500' }}
+          />
 
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.logoutButton]}
-            activeOpacity={0.8}
+          <Button
+            title="Log Out"
+            variant="danger"
+            leftIcon={<Text style={{ fontSize: 18 }}>🚪</Text>}
             onPress={() => {
               // Logout logic
-              router.push('/(tabs)/login' as any);
+              router.replace('/login' as any);
             }}
-          >
-            <Text style={styles.actionButtonIcon}>🚪</Text>
-            <Text style={[styles.actionButtonText, styles.logoutText]}>Log Out</Text>
-          </TouchableOpacity>
+            style={{ marginTop: 12 }}
+          />
         </View>
 
         {/* Bottom Padding */}

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import { Button } from '../../components/ui/Button';
 
 const quizQuestions = [
   {
@@ -135,6 +136,20 @@ export default function QuizPage() {
   const [showResults, setShowResults] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
 
+  useEffect(() => {
+    if (answers[currentQuestion]) {
+      const answerChar = answers[currentQuestion];
+      // Assuming options always start with "A) ", "B) "...
+      // A is 65.
+      const index = answerChar.charCodeAt(0) - 65;
+      if (index >= 0 && index < 4) {
+        setSelectedOption(index);
+      }
+    } else {
+      setSelectedOption(null);
+    }
+  }, [currentQuestion, answers]);
+
   // Calculate progress based on completed answers, not just current question index
   // This ensures 100% is only reached when all questions are answered
   const progress = (answers.length / quizQuestions.length) * 100;
@@ -146,15 +161,15 @@ export default function QuizPage() {
   const handleNext = () => {
     if (selectedOption === null) return;
 
-    const answer = quizQuestions[currentQuestion].options[selectedOption].charAt(0); // Get A, B, C, or D
-    const newAnswers = [...answers, answer];
+    const answer = quizQuestions[currentQuestion].options[selectedOption].charAt(0); 
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = answer; // Update specific index
     setAnswers(newAnswers);
 
     if (currentQuestion < quizQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedOption(null);
+      setSelectedOption(null); 
     } else {
-      // Quiz completed, calculate results
       calculateResults(newAnswers);
     }
   };
@@ -267,37 +282,55 @@ export default function QuizPage() {
               ))}
             </View>
 
-            <TouchableOpacity
-              style={[styles.retakeButton, { backgroundColor: colors.cardBackground, borderColor: colors.primary }]}
+            <Button
+              title="Retake Quiz"
+              variant="outline"
               onPress={() => {
                 setCurrentQuestion(0);
                 setAnswers([]);
                 setSelectedOption(null);
                 setShowResults(false);
               }}
-            >
-              <Text style={[styles.retakeButtonText, { color: colors.primary }]}>Retake Quiz</Text>
-            </TouchableOpacity>
+              style={{ marginBottom: 12 }}
+              textStyle={{ color: colors.primary }}
+            />
 
-            <TouchableOpacity
-              style={[styles.homeButton, { backgroundColor: colors.primary }]}
+            <Button
+              title="Back to Home"
+              variant="primary"
               onPress={() => router.push('/')}
-            >
-              <Text style={styles.homeButtonText}>Back to Home</Text>
-            </TouchableOpacity>
+              style={{ marginBottom: 40 }}
+            />
           </View>
         </ScrollView>
       </View>
     );
   }
 
+  const handleBack = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+      // Do NOT pop the answer. We want to restore the selection via useEffect.
+    } else {
+      // If it's the first question, go back to the previous screen
+      if (fromRoute) {
+        router.push(fromRoute as any);
+      } else {
+        router.push('/(tabs)/' as any);
+      }
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => fromRoute ? router.push(fromRoute as any) : router.push('/(tabs)/' as any)} style={[styles.backButton, { backgroundColor: colors.primaryLight }]}>
+          <TouchableOpacity 
+            onPress={handleBack} 
+            style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
+          >
             <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
-            <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+            <Text style={[styles.backText, { color: colors.primary }]}>{currentQuestion === 0 ? 'Exit Quiz' : 'Back'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -336,15 +369,13 @@ export default function QuizPage() {
           ))}
         </View>
 
-        <TouchableOpacity
-          style={[styles.nextButton, { backgroundColor: selectedOption === null ? colors.inputBackground : colors.primary }]}
+        <Button
+          title={currentQuestion === quizQuestions.length - 1 ? 'See Results' : 'Next Question'}
           onPress={handleNext}
           disabled={selectedOption === null}
-        >
-          <Text style={styles.nextButtonText}>
-            {currentQuestion === quizQuestions.length - 1 ? 'See Results' : 'Next Question'}
-          </Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={styles.nextButton}
+        />
       </ScrollView>
     </View>
   );

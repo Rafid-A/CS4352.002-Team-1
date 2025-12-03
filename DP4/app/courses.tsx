@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from '../components/ui/Button';
 
 interface Course {
   id: number;
@@ -899,13 +900,11 @@ export default function CoursesScreen() {
                 ))}
               </View>
 
-              <TouchableOpacity 
-                style={[styles.enrollButton, { backgroundColor: colors.primary }]}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.enrollText}>Learn More</Text>
-                <Text style={styles.enrollIcon}>→</Text>
-              </TouchableOpacity>
+              <Button
+                title="Learn More"
+                rightIcon={<Text style={{ color: '#FFFFFF', fontSize: 18 }}>→</Text>}
+                variant="primary"
+              />
             </View>
           ))
         )}

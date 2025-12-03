@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { useTheme } from '../../context/ThemeContext';
 import { savedJobsStorage } from '../../utils/storage';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { Button } from '../../components/ui/Button';
 
 export default function JobBoardScreen() {
   const router = useRouter();
@@ -286,13 +287,13 @@ export default function JobBoardScreen() {
 
             <View style={[styles.jobFooter, { borderTopColor: colors.border }]}>
               <Text style={[styles.postedTime, { color: colors.textTertiary }]}>{job.posted}</Text>
-              <TouchableOpacity 
-                style={[styles.applyButton, { backgroundColor: colors.primary }]}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.applyButtonText}>Apply Externally</Text>
-                <Text style={styles.externalIcon}>↗</Text>
-              </TouchableOpacity>
+              <Button
+                title="Apply Externally"
+                rightIcon={<Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>↗</Text>}
+                variant="primary"
+                style={{ paddingVertical: 8, minHeight: 0, paddingHorizontal: 16, borderRadius: 8 }}
+                textStyle={{ fontSize: 14 }}
+              />
             </View>
           </View>
         ))}
