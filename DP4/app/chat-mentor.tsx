@@ -116,7 +116,7 @@ export default function ChatScreen() {
             ],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 500,
+              maxOutputTokens: 250000,
             }
           }),
         }
